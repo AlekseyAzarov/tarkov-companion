@@ -1,0 +1,26 @@
+query ItemById($ids: [ID], $lang: LanguageCode, $gameMode: GameMode) {
+  items(ids: $ids, lang: $lang, gameMode: $gameMode) {
+    id
+    name
+    shortName
+    iconLink
+    basePrice
+    avg24hPrice
+    lastLowPrice
+    width
+    height
+    types
+    sellFor {
+      priceRUB
+      vendor {
+        name
+        normalizedName
+      }
+    }
+    usedInTasks {
+      id
+      name
+      minPlayerLevel
+    }
+  }
+}

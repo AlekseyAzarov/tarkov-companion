@@ -1,0 +1,49 @@
+{
+  "$comment": "Wire names of the WebView bridge protocol (docs/bridge-protocol.md): the envelope and request payload fields, request types, events, features offered in the handshake and routes. The core speaks the protocol, the page is its other end, and the Kotlin SDK names an event and the routes when it restores a screen. Result payloads are in result-payloads.json, error codes in error-codes.json.",
+  "generate": { "cpp": "bridge", "kotlin": "BRIDGE", "typescript": "Bridge" },
+  "names": {
+    "Field": [
+      "version",
+      "id",
+      "type",
+      "payload",
+      "replyTo",
+      "ok",
+      "error",
+      "code",
+      "message",
+      "event",
+      "protocol",
+      "minimumNativeProtocol",
+      "bundleVersion",
+      "sdkVersion",
+      "features",
+      "iconProxy",
+      "initialState",
+      "account",
+      "signedIn",
+      "displayName",
+      "items",
+      "route",
+      "query",
+      "itemId",
+      "favorite",
+      "properties"
+    ],
+    "Request": [
+      "hello",
+      "search",
+      "recommend",
+      "track",
+      "state",
+      "close",
+      "sign_in",
+      "sign_out",
+      "favorites_list",
+      "favorite_set"
+    ],
+    "Event": ["navigate_back", "account_changed", "favorites_changed"],
+    "Feature": ["search", "recommend", "track", "state", "close", "icon_proxy", "sign_in", "favorites"],
+    "Route": ["search", "item"]
+  }
+}

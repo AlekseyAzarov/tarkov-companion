@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Troubleshooting guide
+    url: https://github.com/AlekseyAzarov/tarkov-companion/blob/main/docs/troubleshooting.md
+    about: Known integration issues and their fixes.

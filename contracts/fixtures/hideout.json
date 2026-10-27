@@ -1,0 +1,30 @@
+{
+  "data": {
+    "hideoutStations": [
+      {
+        "name": "Bitcoin farm",
+        "levels": [
+          { "level": 1, "itemRequirements": [] },
+          {
+            "level": 2,
+            "itemRequirements": [
+              { "count": 1, "item": { "id": "57347ca924597744596b4e71" } }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Water collector",
+        "levels": [
+          {
+            "level": 1,
+            "itemRequirements": [
+              { "count": 4, "item": { "id": "59e35cbb86f7741778269d83" } },
+              { "count": 0, "item": { "id": "ignored-zero-count" } }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

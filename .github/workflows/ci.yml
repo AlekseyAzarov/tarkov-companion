@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: C++ core (ASan + UBSan)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S core -B build/core -DTARKOV_COMPANION_BUILD_TESTS=ON -DTARKOV_COMPANION_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+      - name: Build
+        run: cmake --build build/core --parallel
+      - name: Test
+        run: ctest --test-dir build/core --output-on-failure
+
+  web:
+    name: Web UI
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web-ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-ui/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Build (fails over the gzip budget)
+        run: npm run build >> "$GITHUB_STEP_SUMMARY"
+      - name: Development backend tests
+        working-directory: bff
+        run: node --test
+      - name: Catalog generator tests
+        working-directory: .
+        run: node --test scripts/catalog/*.test.mjs
+      - name: Contract checker self-test
+        working-directory: .
+        run: |
+          set +e
+          for mode in same add break; do
+            node scripts/testing/fixture-server.mjs $mode 18080 & server=$!
+            sleep 1
+            TARKOV_COMPANION_ENDPOINT=http://127.0.0.1:18080/ node scripts/contract-check.mjs; code=$?
+            kill $server
+            expected=0; [ $mode = break ] && expected=1
+            [ $code -eq $expected ] || { echo "mode=$mode: exit $code, expected $expected"; exit 1; }
+          done
+
+  android:
+    name: Android SDK + host
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-ui/package-lock.json
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Public API unchanged (run updateKotlinAbi and commit the dump if intended)
+        run: ./gradlew :sdk-android:checkKotlinAbi
+      - name: Unit tests
+        run: ./gradlew :sdk-android:testDebugUnitTest
+      - name: Build and measure footprint
+        run: ./gradlew :sdk-android:assembleRelease footprintReport
+      - name: Footprint to job summary
+        run: cat build/reports/footprint.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-outputs
+          path: |
+            sdk-android/build/outputs/aar/*.aar
+            host-game/build/outputs/apk/**/*.apk
+            sdk-android/build/reports/tests/
+            build/reports/footprint.md
+
+  device:
+    name: On-device tests (emulator)
+    runs-on: ubuntu-24.04
+    needs: [android]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Instrumented tests + core tests on the emulator ABI
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: |
+            ./gradlew :sdk-android:connectedDebugAndroidTest
+            ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/29.0.13846066 bash scripts/run-core-tests-on-device.sh x86_64

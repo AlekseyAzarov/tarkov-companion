@@ -1,0 +1,26 @@
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.vscode/
+.kotlin/
+captures/
+.cxx/
+.externalNativeBuild/
+
+# web-ui
+web-ui/node_modules/
+web-ui/dist/
+
+# Live responses recorded by scripts/contract-check.mjs --record (inspect, then curate into fixtures)
+contracts/recorded/
+
+.DS_Store
+
+# Local emulator launcher (machine-specific paths)
+run-emulator.bat
+
+# Generated from contracts/ by scripts/generate-web-contract.mjs
+web-ui/src/generated/

@@ -1,0 +1,44 @@
+name: Live API contract
+
+# Nightly check that tarkov.dev still answers the SDK's queries in the expected shape.
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check queries against tarkov.dev
+        run: |
+          set +e
+          node scripts/contract-check.mjs --record | tee contract.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::tarkov.dev unavailable; contract not verified today"
+            exit 0
+          fi
+          exit "$code"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recorded-responses
+          path: contracts/recorded/
+      - name: Open an issue on breakage
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "tarkov.dev contract changed ($(date -u +%F))" \
+            --label contract \
+            --body "$(printf 'Nightly contract check failed.\n\n```\n%s\n```\n\nRun: %s' "$(cat contract.log)" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")"

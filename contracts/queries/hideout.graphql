@@ -1,0 +1,14 @@
+query Hideout($lang: LanguageCode, $gameMode: GameMode) {
+  hideoutStations(lang: $lang, gameMode: $gameMode) {
+    name
+    levels {
+      level
+      itemRequirements {
+        count
+        item {
+          id
+        }
+      }
+    }
+  }
+}

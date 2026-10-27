@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- In the app the native side sends a stricter CSP header (img-src 'self'
+         only: icons are proxied). This meta policy covers the dev server. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://assets.tarkov.dev; connect-src 'self' ws://localhost:*; base-uri 'none'; form-action 'none'"
+    />
+    <title>Item lookup</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- What the player sees while the script starts and native connects:
+           the empty search screen, drawn by the stylesheet alone, so the panel
+           is up at once instead of after the handshake. main.tsx replaces it;
+           keep it in step with App and SearchView. -->
+      <div class="backdrop">
+        <main class="panel" aria-busy="true" aria-label="Item lookup">
+          <header class="bar">
+            <span class="brand">Sell or keep?</span>
+            <span class="bar-end"><button class="icon-btn" disabled aria-hidden="true">×</button></span>
+          </header>
+          <section class="search">
+            <input class="search-input" placeholder="Item name, e.g. Salewa" disabled />
+            <p class="hint">Loading…</p>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

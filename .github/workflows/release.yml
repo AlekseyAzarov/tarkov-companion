@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches VERSION
+        run: |
+          test "${GITHUB_REF_NAME#v}" = "$(cat VERSION)" || { echo "tag $GITHUB_REF_NAME != VERSION $(cat VERSION)"; exit 1; }
+          grep -q "^## \[$(cat VERSION)\]" CHANGELOG.md || { echo "CHANGELOG has no entry for $(cat VERSION)"; exit 1; }
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Verify
+        run: ./gradlew :sdk-android:checkKotlinAbi :sdk-android:testDebugUnitTest footprintReport
+      - name: Publish to GitHub Packages
+        run: ./gradlew :sdk-android:publishReleasePublicationToGitHubPackagesRepository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          awk -v v="$(cat VERSION)" '$0 ~ "^## \\[" v "\\]" {p=1; next} /^## \[/ {p=0} p' CHANGELOG.md > notes.md
+          printf '\n' >> notes.md
+          cat build/reports/footprint.md >> notes.md
+          gh release create "$GITHUB_REF_NAME" sdk-android/build/outputs/aar/sdk-android-release.aar --notes-file notes.md

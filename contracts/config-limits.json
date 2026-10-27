@@ -1,0 +1,41 @@
+{
+  "$comment": "Single source of the keys of the session settings documents, their limits and defaults, and constants the core and the platform SDKs share. Generated into C++ by core/cmake/contract.cmake and into Kotlin by buildSrc/GenerateContractSourcesTask.kt. Keys of \"config\", \"profile\" and \"bridgeOptions\" are the JSON keys of tarkov_companion_session_create, tarkov_companion_session_set_profile and tarkov_companion_session_open_bridge.",
+  "config": {
+    "endpoint": { "default": "https://api.tarkov.dev/graphql", "requiredPrefix": "https://" },
+    "language": { "default": "en", "length": 2 },
+    "userAgent": {},
+    "itemCacheCapacity": { "minimum": 16, "maximum": 10000, "default": 512 },
+    "priceTimeToLiveSeconds": { "minimum": 0, "default": 900 },
+    "remoteFlagsUrl": { "requiredPrefix": "https://" },
+    "signInIssuer": { "requiredPrefix": "https://" },
+    "signInClientId": {},
+    "signInRedirectUri": {},
+    "developmentMode": {},
+    "favoritesSyncUrl": { "requiredPrefix": "https://" },
+    "catalogUrl": { "requiredPrefix": "https://" }
+  },
+  "profile": {
+    "playerLevel": { "minimum": 1, "maximum": 100, "default": 15 },
+    "fleaUnlocked": {},
+    "intelligenceCenterLevel": { "minimum": 0, "maximum": 3, "default": 0 },
+    "gameMode": { "default": "regular" },
+    "ignoreKeepReasons": {},
+    "fleaMarginPercent": { "minimum": 0, "maximum": 100, "default": 5 }
+  },
+  "bridgeOptions": {
+    "initialState": {},
+    "openedMillisecondsAgo": { "minimum": 0, "default": 0 }
+  },
+  "shared": {
+    "fleaUnlockLevel": 15,
+    "searchQueryMinimumLength": 2,
+    "searchQueryMaximumLength": 64,
+    "iconProxyPath": "/companion/icon",
+    "iconProxyUrlParameter": "url",
+    "favoritesMaximum": 200,
+    "catalogShardLetters": 3,
+    "catalogShardMinimumLetters": 2,
+    "nativeAbiVersion": 2,
+    "signInEntropyBytes": 48
+  }
+}

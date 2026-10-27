@@ -1,0 +1,278 @@
+public final class com/tarkovcompanion/sdk/Account {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDisplayName ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/tarkovcompanion/sdk/AccountListener {
+	public abstract fun onAccountChanged (Lcom/tarkovcompanion/sdk/Account;)V
+}
+
+public abstract interface class com/tarkovcompanion/sdk/Cancellable {
+	public abstract fun cancel ()V
+}
+
+public abstract interface class com/tarkovcompanion/sdk/CompanionCallback {
+	public abstract fun onError (Lcom/tarkovcompanion/sdk/CompanionException;)V
+	public abstract fun onSuccess (Ljava/lang/Object;)V
+}
+
+public final class com/tarkovcompanion/sdk/CompanionConfig {
+	public static final field Companion Lcom/tarkovcompanion/sdk/CompanionConfig$Companion;
+	public static final field DEFAULT_GRAPHQL_ENDPOINT Ljava/lang/String;
+	public final fun getAnalytics ()Lcom/tarkovcompanion/sdk/host/AnalyticsSink;
+	public final fun getCallbackExecutor ()Ljava/util/concurrent/Executor;
+	public final fun getCatalogUrl ()Ljava/lang/String;
+	public final fun getFavoritesSyncUrl ()Ljava/lang/String;
+	public final fun getGraphqlEndpoint ()Ljava/lang/String;
+	public final fun getHttpTransport ()Lcom/tarkovcompanion/sdk/host/HttpTransport;
+	public final fun getItemCacheCapacity ()I
+	public final fun getLanguage ()Ljava/lang/String;
+	public final fun getLogger ()Lcom/tarkovcompanion/sdk/host/CompanionLogger;
+	public final fun getPriceTimeToLiveSeconds ()I
+	public final fun getRemoteFlagsUrl ()Ljava/lang/String;
+	public final fun getSignIn ()Lcom/tarkovcompanion/sdk/SignInConfig;
+	public final fun getWebContentsDebuggingEnabled ()Ljava/lang/Boolean;
+}
+
+public final class com/tarkovcompanion/sdk/CompanionConfig$Builder {
+	public fun <init> ()V
+	public final fun analytics (Lcom/tarkovcompanion/sdk/host/AnalyticsSink;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun build ()Lcom/tarkovcompanion/sdk/CompanionConfig;
+	public final fun callbackExecutor (Ljava/util/concurrent/Executor;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun catalogUrl (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun favoritesSyncUrl (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun graphqlEndpoint (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun httpTransport (Lcom/tarkovcompanion/sdk/host/HttpTransport;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun itemCacheCapacity (I)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun language (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun logger (Lcom/tarkovcompanion/sdk/host/CompanionLogger;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun priceTimeToLiveSeconds (I)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun remoteFlagsUrl (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun signIn (Lcom/tarkovcompanion/sdk/SignInConfig;)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+	public final fun webContentsDebuggingEnabled (Z)Lcom/tarkovcompanion/sdk/CompanionConfig$Builder;
+}
+
+public final class com/tarkovcompanion/sdk/CompanionConfig$Companion {
+}
+
+public final class com/tarkovcompanion/sdk/CompanionException : java/lang/Exception {
+	public final fun getCode ()Lcom/tarkovcompanion/sdk/ErrorCode;
+}
+
+public final class com/tarkovcompanion/sdk/ErrorCode : java/lang/Enum {
+	public static final field API Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field INTERNAL Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field INVALID_ARGUMENT Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field NATIVE_UNAVAILABLE Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field NETWORK Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field NOT_FOUND Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field NOT_INITIALIZED Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field NOT_SIGNED_IN Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field SCHEMA_MISMATCH Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field SIGN_IN_CANCELLED Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static final field SIGN_IN_FAILED Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/ErrorCode;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/ErrorCode;
+}
+
+public abstract interface class com/tarkovcompanion/sdk/FavoritesListener {
+	public abstract fun onFavoritesChanged (Ljava/util/List;)V
+}
+
+public final class com/tarkovcompanion/sdk/GameMode : java/lang/Enum {
+	public static final field PVE Lcom/tarkovcompanion/sdk/GameMode;
+	public static final field REGULAR Lcom/tarkovcompanion/sdk/GameMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/GameMode;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/GameMode;
+}
+
+public final class com/tarkovcompanion/sdk/LaunchResult : java/lang/Enum {
+	public static final field DISABLED_REMOTELY Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static final field LAUNCHED Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static final field NOT_INITIALIZED Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/LaunchResult;
+}
+
+public final class com/tarkovcompanion/sdk/PlayerProfile {
+	public static final field Companion Lcom/tarkovcompanion/sdk/PlayerProfile$Companion;
+	public static final field DEFAULT Lcom/tarkovcompanion/sdk/PlayerProfile;
+	public static final field FLEA_UNLOCK_LEVEL I
+	public final fun getFleaMarginPercent ()I
+	public final fun getFleaUnlocked ()Z
+	public final fun getGameMode ()Lcom/tarkovcompanion/sdk/GameMode;
+	public final fun getIgnoreKeepReasons ()Z
+	public final fun getIntelligenceCenterLevel ()I
+	public final fun getLevel ()I
+}
+
+public final class com/tarkovcompanion/sdk/PlayerProfile$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/tarkovcompanion/sdk/PlayerProfile;
+	public final fun fleaMarginPercent (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun fleaUnlocked (Z)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun gameMode (Lcom/tarkovcompanion/sdk/GameMode;)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun ignoreKeepReasons (Z)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun intelligenceCenterLevel (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun level (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+}
+
+public final class com/tarkovcompanion/sdk/PlayerProfile$Companion {
+}
+
+public final class com/tarkovcompanion/sdk/SignInConfig {
+	public final fun getClientId ()Ljava/lang/String;
+	public final fun getIssuer ()Ljava/lang/String;
+	public final fun getRedirectScheme ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/SignInConfig$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/tarkovcompanion/sdk/SignInConfig;
+	public final fun clientId (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/SignInConfig$Builder;
+	public final fun issuer (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/SignInConfig$Builder;
+	public final fun redirectScheme (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/SignInConfig$Builder;
+}
+
+public final class com/tarkovcompanion/sdk/TarkovCompanion {
+	public static final field INSTANCE Lcom/tarkovcompanion/sdk/TarkovCompanion;
+	public static final fun addAccountListener (Lcom/tarkovcompanion/sdk/AccountListener;)V
+	public static final fun addFavoritesListener (Lcom/tarkovcompanion/sdk/FavoritesListener;)V
+	public static final fun getCurrentAccount ()Lcom/tarkovcompanion/sdk/Account;
+	public static final fun getFavorites (Lcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+	public static final fun getRecommendation (Ljava/lang/String;Lcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+	public static final fun getSdkVersion ()Ljava/lang/String;
+	public static final fun initialize (Landroid/content/Context;Lcom/tarkovcompanion/sdk/CompanionConfig;)V
+	public static final fun isInitialized ()Z
+	public static final fun prewarm ()V
+	public static final fun removeAccountListener (Lcom/tarkovcompanion/sdk/AccountListener;)V
+	public static final fun removeFavoritesListener (Lcom/tarkovcompanion/sdk/FavoritesListener;)V
+	public static final fun searchItems (Ljava/lang/String;Lcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+	public static final fun setFavorite (Ljava/lang/String;ZLcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+	public static final fun setPlayerProfile (Lcom/tarkovcompanion/sdk/PlayerProfile;)V
+	public static final fun showItemLookup (Landroid/app/Activity;)Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static final fun showItemLookup (Landroid/app/Activity;Ljava/lang/String;)Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static synthetic fun showItemLookup$default (Landroid/app/Activity;Ljava/lang/String;ILjava/lang/Object;)Lcom/tarkovcompanion/sdk/LaunchResult;
+	public static final fun signIn (Landroid/app/Activity;Lcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+	public static final fun signOut (Lcom/tarkovcompanion/sdk/CompanionCallback;)Lcom/tarkovcompanion/sdk/Cancellable;
+}
+
+public abstract interface class com/tarkovcompanion/sdk/host/AnalyticsSink {
+	public abstract fun track (Ljava/lang/String;Ljava/util/Map;)V
+}
+
+public abstract interface class com/tarkovcompanion/sdk/host/CompanionLogger {
+	public abstract fun log (Lcom/tarkovcompanion/sdk/host/LogLevel;Ljava/lang/String;Ljava/lang/Throwable;)V
+}
+
+public final class com/tarkovcompanion/sdk/host/HttpRequest {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;[BI)V
+	public final fun getBody ()[B
+	public final fun getHeaders ()Ljava/util/Map;
+	public final fun getMethod ()Ljava/lang/String;
+	public final fun getTimeoutMilliseconds ()I
+	public final fun getUrl ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/host/HttpResponse {
+	public fun <init> (ILjava/util/Map;[B)V
+	public final fun getBody ()[B
+	public final fun getHeaders ()Ljava/util/Map;
+	public final fun getStatusCode ()I
+	public final fun isSuccessful ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/tarkovcompanion/sdk/host/HttpTransport {
+	public abstract fun execute (Lcom/tarkovcompanion/sdk/host/HttpRequest;)Lcom/tarkovcompanion/sdk/host/HttpResponse;
+}
+
+public final class com/tarkovcompanion/sdk/host/LogLevel : java/lang/Enum {
+	public static final field DEBUG Lcom/tarkovcompanion/sdk/host/LogLevel;
+	public static final field ERROR Lcom/tarkovcompanion/sdk/host/LogLevel;
+	public static final field INFO Lcom/tarkovcompanion/sdk/host/LogLevel;
+	public static final field WARNING Lcom/tarkovcompanion/sdk/host/LogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/host/LogLevel;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/host/LogLevel;
+}
+
+public final class com/tarkovcompanion/sdk/model/FavoriteItem {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getShortName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/FleaOffer {
+	public final fun getAvailable ()Z
+	public final fun getFeeRubles ()J
+	public final fun getListPriceRubles ()J
+	public final fun getNetRubles ()J
+	public final fun getUnavailableReason ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/ItemSummary {
+	public final fun getAveragePriceLast24HoursRubles ()Ljava/lang/Long;
+	public final fun getIconUrl ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getShortName ()Ljava/lang/String;
+	public final fun getSlots ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/KeepReason {
+	public final fun getCount ()I
+	public final fun getKind ()Lcom/tarkovcompanion/sdk/model/KeepReason$Kind;
+	public final fun getLabel ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/KeepReason$Kind : java/lang/Enum {
+	public static final field HIDEOUT Lcom/tarkovcompanion/sdk/model/KeepReason$Kind;
+	public static final field TASK Lcom/tarkovcompanion/sdk/model/KeepReason$Kind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/model/KeepReason$Kind;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/model/KeepReason$Kind;
+}
+
+public final class com/tarkovcompanion/sdk/model/Recommendation {
+	public final fun getBestNetPerSlotRubles ()J
+	public final fun getBestNetRubles ()J
+	public final fun getBestTrader ()Lcom/tarkovcompanion/sdk/model/TraderOffer;
+	public final fun getFlea ()Lcom/tarkovcompanion/sdk/model/FleaOffer;
+	public final fun getFromOfflineCache ()Z
+	public final fun getItemId ()Ljava/lang/String;
+	public final fun getItemName ()Ljava/lang/String;
+	public final fun getKeepReasons ()Ljava/util/List;
+	public final fun getPricesAreStale ()Z
+	public final fun getVerdict ()Lcom/tarkovcompanion/sdk/model/Verdict;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/TraderOffer {
+	public final fun getPriceRubles ()J
+	public final fun getVendorId ()Ljava/lang/String;
+	public final fun getVendorName ()Ljava/lang/String;
+}
+
+public final class com/tarkovcompanion/sdk/model/Verdict : java/lang/Enum {
+	public static final field KEEP Lcom/tarkovcompanion/sdk/model/Verdict;
+	public static final field NO_BUYER Lcom/tarkovcompanion/sdk/model/Verdict;
+	public static final field SELL_FLEA Lcom/tarkovcompanion/sdk/model/Verdict;
+	public static final field SELL_TRADER Lcom/tarkovcompanion/sdk/model/Verdict;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/tarkovcompanion/sdk/model/Verdict;
+	public static fun values ()[Lcom/tarkovcompanion/sdk/model/Verdict;
+}
+

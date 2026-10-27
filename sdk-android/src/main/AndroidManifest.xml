@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <activity
+            android:name=".ui.CompanionActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:enableOnBackInvokedCallback="true"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:theme="@style/tarkov_companion_Overlay"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            tools:targetApi="33" />
+
+        <!-- Sign-in (docs/auth.md): holds one sign-in while the browser shows the page. -->
+        <activity
+            android:name=".ui.SignInActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/tarkov_companion_Invisible" />
+
+        <!-- Where the browser returns: <applicationId>://tarkov-companion-auth. ${applicationId}
+             is the host app's, filled in when the host's manifest is merged. -->
+        <activity
+            android:name=".ui.RedirectActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:theme="@style/tarkov_companion_Invisible">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="tarkov-companion-auth"
+                    android:scheme="${applicationId}" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

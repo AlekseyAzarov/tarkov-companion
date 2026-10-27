@@ -1,0 +1,75 @@
+{
+  "data": {
+    "items": [
+      {
+        "id": "544fb45d4bdc2dee738b4568",
+        "name": "Salewa first aid kit",
+        "shortName": "Salewa",
+        "iconLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-icon.webp",
+        "basePrice": 21000,
+        "avg24hPrice": 26412,
+        "lastLowPrice": 25000,
+        "width": 1,
+        "height": 2,
+        "types": ["meds", "provisions"],
+        "sellFor": [
+          { "priceRUB": 11760, "vendor": { "name": "Therapist", "normalizedName": "therapist" } },
+          { "priceRUB": 8820, "vendor": { "name": "Fence", "normalizedName": "fence" } },
+          { "priceRUB": 25000, "vendor": { "name": "Flea Market", "normalizedName": "flea-market" } }
+        ],
+        "usedInTasks": [
+          { "id": "5967733e86f774602332fc84", "name": "Shortage", "minPlayerLevel": 1 }
+        ]
+      },
+      {
+        "id": "57347ca924597744596b4e71",
+        "name": "Graphics card",
+        "shortName": "GPU",
+        "iconLink": "https://assets.tarkov.dev/57347ca924597744596b4e71-icon.webp",
+        "basePrice": 200000,
+        "avg24hPrice": 512000,
+        "lastLowPrice": 498000,
+        "width": 2,
+        "height": 1,
+        "types": ["barter"],
+        "sellFor": [
+          { "priceRUB": 138000, "vendor": { "name": "Therapist", "normalizedName": "therapist" } },
+          { "priceRUB": 124000, "vendor": { "name": "Mechanic", "normalizedName": "mechanic" } },
+          { "priceRUB": 498000, "vendor": { "name": "Flea Market", "normalizedName": "flea-market" } }
+        ],
+        "usedInTasks": []
+      },
+      {
+        "id": "59e35cbb86f7741778269d83",
+        "name": "Corrugated hose",
+        "shortName": "Hose",
+        "iconLink": "https://assets.tarkov.dev/59e35cbb86f7741778269d83-icon.webp",
+        "basePrice": 15000,
+        "avg24hPrice": 17800,
+        "lastLowPrice": 17000,
+        "width": 1,
+        "height": 1,
+        "types": ["barter"],
+        "sellFor": [
+          { "priceRUB": 9450, "vendor": { "name": "Mechanic", "normalizedName": "mechanic" } },
+          { "priceRUB": 7000, "vendor": { "name": "Fence", "normalizedName": "fence" } }
+        ],
+        "usedInTasks": []
+      },
+      {
+        "id": "5c093ca986f7740a1867ab12",
+        "name": "Secure container Kappa",
+        "shortName": "Kappa",
+        "iconLink": "https://assets.tarkov.dev/5c093ca986f7740a1867ab12-icon.webp",
+        "basePrice": 3000000,
+        "avg24hPrice": null,
+        "lastLowPrice": null,
+        "width": 3,
+        "height": 3,
+        "types": ["noFlea"],
+        "sellFor": [],
+        "usedInTasks": []
+      }
+    ]
+  }
+}

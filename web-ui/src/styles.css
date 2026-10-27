@@ -1,0 +1,398 @@
+:root {
+  --bg: #15171a;
+  --surface: #1f2226;
+  --surface-2: #2a2e33;
+  --text: #e9e6df;
+  --muted: #9a9890;
+  --line: #3a3f45;
+  --accent: #c9b37e;
+  --keep: #e0a43b;
+  --flea: #5fb37a;
+  --trader: #6fa3d9;
+  --none: #8b8b8b;
+  --danger: #e06c5c;
+  --radius: 12px;
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* Landscape phone with the keyboard up: every pixel of height counts. */
+@media (max-height: 480px) {
+  .backdrop {
+    align-items: flex-start;
+    padding: 4px 16px;
+  }
+  .panel {
+    padding: 4px 12px 12px;
+  }
+  .bar {
+    min-height: 36px;
+  }
+  .hint,
+  .error {
+    margin: 8px 0;
+  }
+}
+
+.panel {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.6);
+  padding: 12px 16px 20px;
+}
+
+.panel.fatal {
+  text-align: center;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.section-title {
+  margin: 16px 0 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.star {
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.star.on {
+  color: var(--accent);
+}
+
+.bar-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-name {
+  max-width: 10em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.icon-btn:active {
+  background: var(--surface-2);
+}
+
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.hint {
+  color: var(--muted);
+  margin: 16px 2px;
+}
+
+.results {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+}
+
+.result:active {
+  background: var(--surface-2);
+}
+
+.result-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.result-name small,
+.numbers small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.icon.large {
+  width: 64px;
+  height: 64px;
+}
+
+.item-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 16px;
+}
+
+.item-head h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border-left: 6px solid var(--none);
+}
+
+.verdict-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.verdict-line {
+  color: var(--muted);
+}
+
+.v-keep {
+  border-left-color: var(--keep);
+}
+.v-keep .verdict-title {
+  color: var(--keep);
+}
+.v-sell_flea {
+  border-left-color: var(--flea);
+}
+.v-sell_flea .verdict-title {
+  color: var(--flea);
+}
+.v-sell_trader {
+  border-left-color: var(--trader);
+}
+.v-sell_trader .verdict-title {
+  color: var(--trader);
+}
+
+.skeleton {
+  height: 92px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.badge {
+  display: inline-block;
+  margin: 12px 0 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.badge.offline {
+  background: rgb(224 164 59 / 0.15);
+  color: var(--keep);
+}
+
+.reasons {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-block;
+  min-width: 64px;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  text-align: center;
+  background: var(--surface-2);
+}
+
+.tag.task {
+  color: var(--keep);
+}
+
+.tag.hideout {
+  color: var(--trader);
+}
+
+.numbers {
+  margin: 20px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.numbers div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.numbers dt {
+  color: var(--muted);
+}
+
+.numbers dd {
+  margin: 0;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  font-variant-numeric: tabular-nums;
+}
+
+.numbers .warn {
+  color: var(--keep);
+}
+
+.error {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgb(224 108 92 / 0.12);
+  color: var(--danger);
+}
+
+.error p {
+  margin: 0;
+}
+
+.retry {
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}

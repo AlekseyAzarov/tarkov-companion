@@ -1,0 +1,49 @@
+name: Catalog
+
+# The static catalog the SDK reads when tarkov.dev's GraphQL API is down
+# (docs/catalog.md): rebuilt from json.tarkov.dev every hour and published on
+# GitHub Pages under /catalog/. Needs Pages enabled with "GitHub Actions" as
+# the source. A failed build publishes nothing, so the last good catalog stays up.
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: catalog
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the generator
+        run: node --test scripts/catalog/*.test.mjs
+      - name: Build the catalog
+        run: node scripts/build-catalog.mjs --out _site/catalog
+      - name: Summary
+        run: |
+          echo "### Catalog" >> "$GITHUB_STEP_SUMMARY"
+          cat _site/catalog/manifest.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

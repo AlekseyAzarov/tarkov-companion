@@ -1,0 +1,33 @@
+{
+  "$comment": "How the static catalog splits names into search words, picks a search shard for a query, and matches items. scripts/build-catalog.mjs writes the shards and core/src/catalog.cpp reads them: both test against these cases, so they can't drift apart. See docs/catalog.md.",
+  "words": [
+    { "text": "Salewa first aid kit", "words": ["salewa", "first", "aid", "kit"] },
+    { "text": "Colt M4A1 5.56x45 assault rifle", "words": ["colt", "m4a1", "5", "56x45", "assault", "rifle"] },
+    { "text": "  GPU  ", "words": ["gpu"] },
+    { "text": "Аптечка «Салева» (Ёлка)", "words": ["аптечка", "салева", "елка"] },
+    { "text": "Zé-Café MÜLLER", "words": ["zé", "café", "müller"] },
+    { "text": "2×3 ½", "words": ["2", "3"] },
+    { "text": "", "words": [] }
+  ],
+  "shards": [
+    { "query": "graphics", "shard": "677261.json" },
+    { "query": "gr", "shard": "6772.json" },
+    { "query": "GRAPHICS card", "shard": "677261.json" },
+    { "query": "m4 assault", "shard": "617373.json" },
+    { "query": "аптечка", "shard": "d0b0d0bfd182.json" },
+    { "query": "Гр", "shard": "d0b3d180.json" },
+    { "query": "a b", "shard": null },
+    { "query": "--", "shard": null }
+  ],
+  "matches": [
+    { "query": "salewa", "name": "Salewa first aid kit", "shortName": "Salewa", "matches": true },
+    { "query": "aid kit", "name": "Salewa first aid kit", "shortName": "Salewa", "matches": true },
+    { "query": "aid gun", "name": "Salewa first aid kit", "shortName": "Salewa", "matches": false },
+    { "query": "gpu", "name": "Graphics card", "shortName": "GPU", "matches": true },
+    { "query": "raphics", "name": "Graphics card", "shortName": "GPU", "matches": false },
+    { "query": "m4a", "name": "Colt M4A1 5.56x45 assault rifle", "shortName": "M4A1", "matches": true },
+    { "query": "ёлка", "name": "Новогодняя елка", "shortName": "Елка", "matches": true },
+    { "query": "аптечка салева", "name": "Аптечка Salewa First Aid Kit", "shortName": "Salewa", "matches": false },
+    { "query": "аптечка sal", "name": "Аптечка Salewa First Aid Kit", "shortName": "Salewa", "matches": true }
+  ]
+}

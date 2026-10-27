@@ -1,0 +1,177 @@
+{
+  "$comment": "Bridge protocol v1 as a conversation (docs/bridge-protocol.md). core/tests/bridge_transcript_test.cpp sends each `web` message to a real session (which fetches `remoteFlags` like a real one; GraphQL answered with the other fixtures) and checks the `native` replies; a string \"*\" matches any value, objects may carry extra fields. web-ui/test/transcript.test.ts checks the web validators accept every reply.",
+  "remoteFlags": {
+    "url": "https://flags.example/companion.json",
+    "document": { "schema": 1, "webFlowEnabled": true, "minimumWebProtocol": 1, "disabledBundleVersions": ["0.0.9"] }
+  },
+  "bridgeOptions": {
+    "initialState": { "route": "search" }
+  },
+  "exchanges": [
+    {
+      "about": "requests before the handshake are refused",
+      "web": { "version": 1, "id": "w1", "type": "search", "payload": { "query": "salewa" } },
+      "native": [
+        { "version": 1, "replyTo": "w1", "ok": false, "error": { "code": "not_ready", "message": "hello first" } }
+      ]
+    },
+    {
+      "about": "unreadable messages are answered without an id",
+      "web": "nope",
+      "native": [
+        { "version": 1, "replyTo": null, "ok": false, "error": { "code": "invalid_message", "message": "not a JSON object" } }
+      ]
+    },
+    {
+      "about": "a bundle that needs a newer native protocol is refused",
+      "web": { "version": 1, "id": "h1", "type": "hello", "payload": { "protocol": 1, "minimumNativeProtocol": 2, "bundleVersion": "0.2.0" } },
+      "native": [
+        { "version": 1, "replyTo": "h1", "ok": false, "error": { "code": "incompatible_protocol", "message": "web bundle needs native protocol 2" } }
+      ]
+    },
+    {
+      "about": "a bundle version switched off by remote flags is refused",
+      "web": { "version": 1, "id": "h2", "type": "hello", "payload": { "protocol": 1, "minimumNativeProtocol": 1, "bundleVersion": "0.0.9" } },
+      "native": [
+        { "version": 1, "replyTo": "h2", "ok": false, "error": { "code": "bundle_disabled", "message": "bundle 0.0.9 disabled remotely" } }
+      ]
+    },
+    {
+      "about": "handshake",
+      "web": { "version": 1, "id": "h3", "type": "hello", "payload": { "protocol": 1, "minimumNativeProtocol": 1, "bundleVersion": "0.1.0" } },
+      "native": [
+        {
+          "version": 1, "replyTo": "h3", "ok": true,
+          "payload": {
+            "protocol": 1,
+            "sdkVersion": "*",
+            "features": ["search", "recommend", "track", "state", "close", "icon_proxy", "favorites"],
+            "iconProxy": "/companion/icon?url=",
+            "initialState": { "route": "search" }
+          }
+        }
+      ]
+    },
+    {
+      "about": "unknown request types are answered, so newer bundles can feature-detect",
+      "web": { "version": 1, "id": "w2", "type": "teleport", "payload": {} },
+      "native": [
+        { "version": 1, "replyTo": "w2", "ok": false, "error": { "code": "unsupported_type", "message": "unsupported type 'teleport'" } }
+      ]
+    },
+    {
+      "about": "payload limits",
+      "web": { "version": 1, "id": "w3", "type": "search", "payload": { "query": "a" } },
+      "native": [
+        { "version": 1, "replyTo": "w3", "ok": false, "error": { "code": "invalid_message", "message": "invalid query length" } }
+      ]
+    },
+    {
+      "about": "search",
+      "web": { "version": 1, "id": "w4", "type": "search", "payload": { "query": "salewa" } },
+      "native": [
+        {
+          "version": 1, "replyTo": "w4", "ok": true,
+          "payload": {
+            "items": [
+              { "id": "544fb45d4bdc2dee738b4568", "name": "Salewa first aid kit", "shortName": "Salewa", "iconLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-icon.webp", "slots": 2, "averagePriceLast24Hours": 26412 },
+              { "id": "57347ca924597744596b4e71", "name": "Graphics card", "shortName": "GPU", "iconLink": "https://assets.tarkov.dev/57347ca924597744596b4e71-icon.webp", "slots": 2, "averagePriceLast24Hours": 512000 },
+              { "id": "59e35cbb86f7741778269d83", "name": "Corrugated hose", "shortName": "Hose", "iconLink": "https://assets.tarkov.dev/59e35cbb86f7741778269d83-icon.webp", "slots": 1, "averagePriceLast24Hours": 17800 },
+              { "id": "5c093ca986f7740a1867ab12", "name": "Secure container Kappa", "shortName": "Kappa", "iconLink": "https://assets.tarkov.dev/5c093ca986f7740a1867ab12-icon.webp", "slots": 9, "averagePriceLast24Hours": null }
+            ],
+            "fromCache": false,
+            "cacheAgeSeconds": 0
+          }
+        }
+      ]
+    },
+    {
+      "about": "verdict: the recommendation is core_recommendation.json",
+      "web": { "version": 1, "id": "w5", "type": "recommend", "payload": { "itemId": "544fb45d4bdc2dee738b4568" } },
+      "native": [
+        {
+          "version": 1, "replyTo": "w5", "ok": true,
+          "payload": {
+            "recommendation": {
+              "itemId": "544fb45d4bdc2dee738b4568", "itemName": "Salewa first aid kit", "verdict": "keep",
+              "bestNetRubles": 23615, "bestNetPerSlotRubles": 11807, "pricesAreStale": false,
+              "bestTrader": { "vendorId": "therapist", "vendorName": "Therapist", "priceRubles": 11760 },
+              "flea": { "available": true, "listPriceRubles": 24999, "feeRubles": 1384, "netRubles": 23615 },
+              "keepReasons": [{ "kind": "task", "label": "Shortage", "count": 1 }]
+            },
+            "fromCache": false,
+            "hideoutMissing": false
+          }
+        }
+      ]
+    },
+    {
+      "about": "SDK errors reach the page with their code",
+      "web": { "version": 1, "id": "w6", "type": "recommend", "payload": { "itemId": "deadbeef" } },
+      "native": [
+        { "version": 1, "replyTo": "w6", "ok": false, "error": { "code": "not_found", "message": "unknown item deadbeef" } }
+      ]
+    },
+    {
+      "about": "analytics from the page",
+      "web": { "version": 1, "id": "w7", "type": "track", "payload": { "event": "item_opened", "properties": { "source": "search" } } },
+      "native": [
+        { "version": 1, "replyTo": "w7", "ok": true, "payload": {} }
+      ]
+    },
+    {
+      "about": "state for process-death restore",
+      "web": { "version": 1, "id": "w8", "type": "state", "payload": { "route": "item", "query": "salewa", "itemId": "544fb45d4bdc2dee738b4568" } },
+      "native": [
+        { "version": 1, "replyTo": "w8", "ok": true, "payload": {} }
+      ]
+    },
+    {
+      "about": "favourites start empty",
+      "web": { "version": 1, "id": "f1", "type": "favorites_list", "payload": {} },
+      "native": [
+        { "version": 1, "replyTo": "f1", "ok": true, "payload": { "items": [] } }
+      ]
+    },
+    {
+      "about": "starring an item: the page hears about the new list, then gets the answer",
+      "web": { "version": 1, "id": "f2", "type": "favorite_set", "payload": { "itemId": "544fb45d4bdc2dee738b4568", "favorite": true } },
+      "native": [
+        {
+          "version": 1, "event": "favorites_changed",
+          "payload": { "items": [{ "id": "544fb45d4bdc2dee738b4568", "name": "Salewa first aid kit", "shortName": "Salewa", "iconLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-icon.webp" }] }
+        },
+        { "version": 1, "replyTo": "f2", "ok": true, "payload": {} }
+      ]
+    },
+    {
+      "about": "the list, with names from the catalog",
+      "web": { "version": 1, "id": "f3", "type": "favorites_list", "payload": {} },
+      "native": [
+        {
+          "version": 1, "replyTo": "f3", "ok": true,
+          "payload": { "items": [{ "id": "544fb45d4bdc2dee738b4568", "name": "Salewa first aid kit", "shortName": "Salewa", "iconLink": "https://assets.tarkov.dev/544fb45d4bdc2dee738b4568-icon.webp" }] }
+        }
+      ]
+    },
+    {
+      "about": "sign-in on an SDK without it configured: refused, so the page can hide the button",
+      "web": { "version": 1, "id": "w10", "type": "sign_in", "payload": {} },
+      "native": [
+        { "version": 1, "replyTo": "w10", "ok": false, "error": { "code": "unsupported_type", "message": "sign-in is not configured" } }
+      ]
+    },
+    {
+      "about": "sign-out likewise",
+      "web": { "version": 1, "id": "w11", "type": "sign_out", "payload": {} },
+      "native": [
+        { "version": 1, "replyTo": "w11", "ok": false, "error": { "code": "unsupported_type", "message": "sign-in is not configured" } }
+      ]
+    },
+    {
+      "about": "close gets no answer: the screen goes away",
+      "web": { "version": 1, "id": "w9", "type": "close", "payload": {} },
+      "native": []
+    }
+  ]
+}

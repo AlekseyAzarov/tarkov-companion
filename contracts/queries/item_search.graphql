@@ -1,0 +1,26 @@
+query ItemSearch($name: String!, $lang: LanguageCode, $gameMode: GameMode, $limit: Int) {
+  items(name: $name, lang: $lang, gameMode: $gameMode, limit: $limit) {
+    id
+    name
+    shortName
+    iconLink
+    basePrice
+    avg24hPrice
+    lastLowPrice
+    width
+    height
+    types
+    sellFor {
+      priceRUB
+      vendor {
+        name
+        normalizedName
+      }
+    }
+    usedInTasks {
+      id
+      name
+      minPlayerLevel
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$comment": "Every analytics event the SDK sends to the host's AnalyticsSink, and its properties (all values are strings). Names are part of the compatibility promise (docs/analytics.md). Generated into C++ by core/cmake/contract.cmake and into Kotlin by buildSrc/GenerateContractSourcesTask.kt; tests on both sides check that nothing outside this list is sent. `emittedBy` says which layer knows the fact the event reports.",
+  "webEventPrefix": "web_",
+  "events": {
+    "companion_opened": { "emittedBy": "platform", "properties": ["restored"] },
+    "companion_closed": { "emittedBy": "platform", "properties": ["duration_milliseconds"] },
+    "companion_launch_failed": { "emittedBy": "platform", "properties": ["reason"] },
+    "companion_launch_blocked": { "emittedBy": "platform", "properties": ["reason"] },
+    "companion_renderer_gone": { "emittedBy": "platform", "properties": [] },
+    "bridge_handshake": { "emittedBy": "core", "properties": ["web_protocol", "bundle_version", "result"] },
+    "bridge_error": { "emittedBy": "core", "properties": ["code"] },
+    "bridge_request_failed": { "emittedBy": "core", "properties": ["code"] },
+    "search_completed": { "emittedBy": "core", "properties": ["latency_milliseconds", "from_cache"] },
+    "verdict_shown": { "emittedBy": "core", "properties": ["verdict", "latency_milliseconds", "from_cache", "time_to_first_verdict_milliseconds"] },
+    "sign_in_completed": { "emittedBy": "core", "properties": ["result"] },
+    "signed_out": { "emittedBy": "core", "properties": ["reason"] },
+    "favorite_toggled": { "emittedBy": "core", "properties": ["favorite", "signed_in"] }
+  }
+}

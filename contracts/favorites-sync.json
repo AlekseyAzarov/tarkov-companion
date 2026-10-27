@@ -1,0 +1,7 @@
+{
+  "$comment": "Field names of the favourites sync between the core and the game's backend (docs/favorites.md): POST {since, changes} answered with {changes, cursor}. bff/src/server.mjs is the development implementation of the backend side.",
+  "generate": { "cpp": "favorites_sync" },
+  "names": {
+    "Field": ["since", "changes", "cursor", "itemId", "favorite", "changedAt", "name", "shortName", "iconLink"]
+  }
+}
