@@ -76,6 +76,11 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web-ui/package-lock.json
+      - name: Android SDK packages the build pins (NDK, CMake, platform)
+        run: |
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$sdkmanager" --licenses > /dev/null
+          "$sdkmanager" --install "ndk;29.0.13846066" "cmake;3.22.1" "platforms;android-36" > /dev/null
       - uses: gradle/actions/setup-gradle@v4
       - name: Public API unchanged (run updateKotlinAbi and commit the dump if intended)
         run: ./gradlew :sdk-android:checkKotlinAbi
@@ -108,6 +113,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Android SDK packages the build pins (NDK, CMake, platform)
+        run: |
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$sdkmanager" --licenses > /dev/null
+          "$sdkmanager" --install "ndk;29.0.13846066" "cmake;3.22.1" "platforms;android-36" > /dev/null
       - uses: gradle/actions/setup-gradle@v4
       - name: Enable KVM
         run: |
