@@ -32,7 +32,8 @@ lifecycle changes. Account UIs embedded in games often work this way.
 Keep the overlay an activity of its own. The in-window overlay wins one
 property (the game stays resumed). Where it loses, the cause lies in the
 game's manifest or window flags, which the SDK can't fix from its side. The
-activity's lifecycle cost is predictable and documented; the others are not.
+activity's lifecycle cost is predictable and documented; the in-window
+overlay's costs are not.
 
 What the game sees is spelled out in the [integration guide](../integration-guide.md#4-open-it):
 `onPause` without `onStop`, so the surface and the GL context stay, and a

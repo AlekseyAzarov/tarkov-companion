@@ -20,10 +20,10 @@ TarkovCompanion.initialize(this, CompanionConfig.Builder()
     .build())
 ```
 
-Without it nothing changes: an outage leaves the offline cache, as before.
-With it, a read the GraphQL API fails goes to the catalog; after such a
-failure, reads go straight to the catalog for 10 minutes. If the catalog
-fails too, the offline cache is served as before. The logs say which source
+Without it, an outage leaves only the offline cache. With it, a read that
+fails on the GraphQL API goes to the catalog; after such a failure, reads go
+straight to the catalog for 10 minutes. If the catalog fails too, the offline
+cache is served. The logs say which source
 answered: `tarkov.dev's GraphQL API failed; reading the catalog for the next
 10 minutes`.
 
@@ -33,7 +33,7 @@ answered: `tarkov.dev's GraphQL API failed; reading the catalog for the next
 |---|---|---:|
 | Search | the shard of the query's longest word, by its first 3 letters (2 for a 2-letter word) | median 0.6 KB, 90% under 2.4 KB; worst 36 KB (3 letters), 54 KB (2 letters) |
 | Verdict for an item not yet seen | the item's file | ~0.4 KB |
-| Hideout | one file, kept a day like before | 2.5 KB |
+| Hideout | one file, kept for a day | 2.5 KB |
 
 The large shards are common beginnings (`ar`, `ma`) and calibers (`62` from
 `7.62x39`). They hold whole items, trader offers and tasks included, because
@@ -48,8 +48,8 @@ catalog/<regular|pve>/<en|ru>/search/<shard>.json      ItemSearch response
 catalog/<regular|pve>/<en|ru>/hideout.json             Hideout response
 ```
 
-Other languages read English. A shard's name is the hex of the UTF-8 of its
-letters: `677261.json` is "gra".
+Other languages read English. A shard's name is its letters' UTF-8 bytes in
+hex: `677261.json` is "gra".
 
 ## How search works without a search engine
 
@@ -96,8 +96,8 @@ fewer than 1000 items fails the build instead of publishing a broken catalog.
 
 [`.github/workflows/catalog.yml`](../.github/workflows/catalog.yml) rebuilds
 it at :41 every hour and deploys it to GitHub Pages under `/catalog/`. It
-needs the repository on GitHub with Pages enabled, source "GitHub Actions".
-GitHub may delay scheduled runs and disables them after 60 days without
+needs the repository on GitHub with Pages enabled and its source set to
+"GitHub Actions". GitHub may delay scheduled runs and disable them after 60 days without
 activity in a public repository; a failed run publishes nothing, so the last
 good catalog stays up.
 

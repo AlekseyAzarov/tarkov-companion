@@ -28,7 +28,7 @@ The Custom Tab needs no `androidx.browser` dependency: it is a plain
 `ACTION_VIEW` intent with the session extra (ADR 0003).
 
 The redirect scheme is `${applicationId}` in the SDK's own manifest, so a
-host needs no placeholder or manifest entry. A scheme must be lowercase
+host needs no placeholder or manifest entry. A scheme must consist of lowercase
 letters, digits, `+`, `-` and `.`, and Android matches it case-sensitively
 while browsers lowercase it, so an applicationId with uppercase letters or
 `_` can't be one: such a host sets `SignInConfig.Builder.redirectScheme()`

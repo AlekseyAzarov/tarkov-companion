@@ -21,7 +21,7 @@ platform stores bytes and nothing more. Integration details are in
 Every change is applied and saved locally first, then synced. The list is
 never "loading from the server": a player in a raid with no network sees and
 edits it the same way. Changes made offline wait in an outbox saved with the
-list, and go with the next sync: after the next change, at the next start,
+list and go with the next sync: after the next change, at the next start,
 or when the overlay opens or the host reads the list while they wait.
 
 Signed out, the list is the device's. On sign-in it moves into the
@@ -70,7 +70,7 @@ everything else in the core: refresh before expiry, one retry after a 401.
 The page and the host pass an item id; the core takes the name, short name
 and icon from items it has already received from tarkov.dev in this
 session. An unknown id is `NOT_FOUND`. Neither a compromised page nor a
-caller can put text of its own into the list, and through sync into other
+caller can put text of its own into the list or, through sync, onto other
 devices. A list that only stored ids would avoid this too, but would need a
 tarkov.dev request on every device before showing anything.
 

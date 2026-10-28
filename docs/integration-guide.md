@@ -121,7 +121,7 @@ guide: [auth.md](auth.md).
 
 ## Favourites
 
-Work out of the box, on the device. With sign-in and
+They work out of the box, on the device. With sign-in and
 `CompanionConfig.Builder().favoritesSyncUrl(...)` they follow the player
 across devices. API: `TarkovCompanion.getFavorites`, `setFavorite`,
 `addFavoritesListener`. What your server needs: [favorites.md](favorites.md).

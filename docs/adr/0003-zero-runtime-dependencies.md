@@ -4,7 +4,7 @@
 
 ## Context
 
-Every dependency an SDK declares becomes the host's dependency. Games pin library versions for long stretches; an SDK that pulls OkHttp 5 into a game on OkHttp 4, or a newer `kotlinx-coroutines` than the game's other SDKs, creates conflicts the game team can only fix by excluding things and hoping.
+Every dependency an SDK declares becomes the host's dependency. Games pin library versions for long stretches; an SDK that pulls OkHttp 5 into a game on OkHttp 4, or a newer `kotlinx-coroutines` than the game's other SDKs, creates conflicts the game team can only work around with exclusions.
 
 ## Decision
 
@@ -25,4 +25,4 @@ The SDK's runtime classpath is empty apart from the Kotlin stdlib.
 - Even the stdlib is kept conservative: the SDK compiles with `languageVersion`/`apiVersion` 2.2 and depends on `kotlin-stdlib` 2.2.21, although the build itself uses Kotlin 2.4. A host on an older Kotlin toolchain can read our class metadata and isn't force-upgraded.
 - The public API stays Java- and JNI-friendly: no `suspend` functions, no `Flow`.
 - A little more code of our own: a small `HttpURLConnection` transport and a serial executor, both covered by tests.
-- Hosts routing traffic through `HttpTransport` get their proxy, certificate pinning and metrics applied to the SDK, including item icons, which are proxied through it too.
+- Hosts routing traffic through `HttpTransport` get their proxy, certificate pinning and metrics applied to the SDK, item icons included.

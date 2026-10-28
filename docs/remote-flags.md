@@ -31,7 +31,7 @@ Implemented in the C++ core ([`remote_flags.cpp`](../core/src/remote_flags.cpp),
 
 - Loaded once per process, through the host's `HttpTransport`. With a flags URL (or sign-in) configured, the SDK opens its native core as soon as the main thread first goes idle after `initialize()`, on a background thread; without either, the core loads only on the first lookup.
 - The last good document is persisted. A kill switch survives a cold start **without network**: the cached document is applied before the network refresh.
-- On first ever launch, defaults apply until the first fetch completes. A kill switch therefore takes effect within one session, not instantly. That's the trade-off for keeping `initialize()` free of I/O.
+- On the very first launch, defaults apply until the first fetch completes. A kill switch therefore takes effect within one session, not instantly. That's the trade-off for keeping `initialize()` free of I/O.
 - Documents with an unknown `schema`, or that don't parse, are ignored and logged. A bad push cannot brick the SDK.
 - Unknown fields are ignored, and fields of the wrong type keep their defaults, so new flags can be added without breaking old SDKs.
 - The web bundle checks (`minimumWebProtocol`, `disabledBundleVersions`) run at handshake time, against the flags in force then: a page opened before the document arrived is still subject to it.

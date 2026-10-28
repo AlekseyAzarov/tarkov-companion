@@ -4,7 +4,7 @@ How the web flow inside the WebView talks to the native SDK.
 
 Implementations: native, in the C++ core, [`bridge_protocol.cpp`](../core/src/bridge_protocol.cpp) / [`bridge.cpp`](../core/src/bridge.cpp) ([ADR 0007](adr/0007-bridge-protocol-in-core.md)); web [`protocol.ts`](../web-ui/src/bridge/protocol.ts) / [`bridge.ts`](../web-ui/src/bridge/bridge.ts). The platform SDK only carries messages between the page and the core.
 
-Both sides are checked against one conversation, [`bridge_transcript.json`](../contracts/fixtures/bridge_transcript.json): the core replays it and matches every reply, the web validators must accept every reply.
+Both sides are checked against one conversation, [`bridge_transcript.json`](../contracts/fixtures/bridge_transcript.json): the core replays it and matches every reply; the web validators must accept every reply.
 
 Every name on the wire (fields, request types, events, features, routes, error codes, result payloads) is listed in [`bridge-protocol.json`](../contracts/bridge-protocol.json), [`error-codes.json`](../contracts/error-codes.json) and [`result-payloads.json`](../contracts/result-payloads.json). Both sides generate their constants from these files, so a name can't be misspelt on one side only.
 
@@ -102,9 +102,9 @@ Messages over 16 KiB are rejected before parsing.
 
 | event | meaning |
 |---|---|
-| `navigate_back` | system back pressed while the web flow is on the item screen |
+| `navigate_back` | the system back button was pressed while the web flow is on the item screen |
 | `account_changed` | `{ account: { signedIn, displayName? } }`: signed in or out, from the page, the game, or an expired session |
-| `favorites_changed` | `{ items: FavoriteView[] }`: the whole list after any change: from this page, the game, a sync from another device, or a sign-in or sign-out |
+| `favorites_changed` | `{ items: FavoriteView[] }`: the whole list after any change (from this page, the game, a sync from another device, or a sign-in or sign-out) |
 
 ## Error codes
 
@@ -122,5 +122,5 @@ Messages over 16 KiB are rejected before parsing.
 ## Changing the protocol
 
 - Additive (new request type, new optional field): no version bump. Old SDKs answer `unsupported_type`; old bundles ignore new fields.
-- Breaking: bump `VERSION` on the side that changes, keep serving the old version until the remote `minimumWebProtocol` says otherwise.
-- Update this file, both implementations, and [`bridge_transcript.json`](../contracts/fixtures/bridge_transcript.json) in the same PR (the PR template asks). The transcript is what fails if you forget one side.
+- Breaking: bump `VERSION` on the side that changes, and keep serving the old version until the remote `minimumWebProtocol` says otherwise.
+- Update this file, both implementations, and [`bridge_transcript.json`](../contracts/fixtures/bridge_transcript.json) in the same PR (the PR template asks for this). The transcript is what fails if you forget one side.

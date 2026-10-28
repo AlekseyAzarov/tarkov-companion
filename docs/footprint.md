@@ -22,7 +22,7 @@ Measured 2026-10-28, SDK 0.1.0 with the core session, bridge, remote flags, sign
 | Universal APK, 3 ABIs | +924.7 KB |
 | AAR | 592.8 KB |
 
-Inside the arm64 `.so` once the bridge was in the core (symbol sizes, before packaging; what the later parts added is below):
+Inside the arm64 `.so` with the session and the bridge (symbol sizes before packaging; the later parts are in the next table):
 
 | | |
 |---|---:|
@@ -52,7 +52,7 @@ struct is the clearest way to win size back, at some cost in readability.
 
 ### The demangler
 
-Without a stub, the arm64 library of the first build was **288.5 KB**, and 118 KB of it was libc++abi's Itanium **demangler**, more than all of the SDK's own code. It is reachable only from the default terminate handler, which prints the demangled type of an uncaught exception.
+Without the stub, the first arm64 build of the library was **288.5 KB**, and 118 KB of it was libc++abi's Itanium **demangler**, more than all of the SDK's own code. It is reachable only from the default terminate handler, which prints the demangled type of an uncaught exception.
 
 The core is built with `-fno-exceptions` and the C API never lets one escape, so that message can't occur. [`demangle_stub.cpp`](../sdk-android/src/main/cpp/demangle_stub.cpp) defines `__cxa_demangle` as a stub; the linker then never pulls the real one from the static archive. Result: 288.5 → 117.5 KB (−59%) on arm64, universal APK delta 811 → 365 KB. Controlled by the CMake option `TARKOV_COMPANION_STUB_DEMANGLER` (default on). Verified by the instrumented tests running against the stubbed library.
 
@@ -123,4 +123,4 @@ PSS of the host process, same emulator:
 | In game, overlay never opened | 16–17 MB | 17 MB |
 | Overlay open | n/a | 85 MB |
 
-Before first use the SDK costs about nothing. **Opening the overlay costs ~68 MB**, almost all of it the WebView (Chromium loaded into the process). That is the main price of the WebView approach, weighed in [ADR 0002](adr/0002-webview-vs-flutter.md). The SDK destroys its WebView in `onDestroy`, but Chromium's shared state stays mapped for the rest of the process, so a game that never shows any web UI pays this once per session.
+Before first use the SDK costs almost nothing. **Opening the overlay costs ~68 MB**, almost all of it the WebView (Chromium loaded into the process). That is the main price of the WebView approach, weighed in [ADR 0002](adr/0002-webview-vs-flutter.md). The SDK destroys its WebView in `onDestroy`, but Chromium's shared state stays mapped for the rest of the process, so a game with no other web UI pays this once per session.

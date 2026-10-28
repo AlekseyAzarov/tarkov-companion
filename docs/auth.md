@@ -27,8 +27,8 @@ TarkovCompanion.signOut(callback)                     // immediate, works offlin
 ```
 
 The overlay shows a "Sign in" button on its own when sign-in is configured.
-The result reaches the page the same way whoever started it: from the
-game's own button or from the overlay.
+The result reaches the page the same way, whoever started it: the game's
+own button or the overlay.
 
 After a cold start the SDK restores the sign-in from its secret store
 shortly after `initialize()`. The account listener fires when it does.
@@ -57,7 +57,7 @@ shortly after `initialize()`. The account listener fires when it does.
 
 ### An applicationId that can't be a scheme
 
-A URI scheme is lowercase letters, digits, `+`, `-` and `.`. Android matches
+A usable URI scheme consists of lowercase letters, digits, `+`, `-` and `.`. Android matches
 intent-filter schemes case-sensitively, and browsers lowercase the scheme they
 redirect to, so with an applicationId like `com.Studio.Game` or
 `com.studio.my_game` the browser's answer would never reach the game. The SDK
@@ -93,8 +93,8 @@ Register `com.studio.mygame://tarkov-companion-auth` on the server.
   dependency.
 - **PKCE and state:** a code intercepted on the way back is useless without
   the verifier, which never leaves the process. A redirect is redeemed only if
-  it goes to exactly the registered URI (the scheme compared without regard to
-  case) and carries the `state` of the sign-in in progress. Any other link is
+  it goes to exactly the registered URI (the scheme is compared
+  case-insensitively) and carries the `state` of the sign-in in progress. Any other link is
   ignored and logged, and the real sign-in goes on: the redirect activity is
   exported, so any app can send one, and it must not be able to cancel a
   sign-in either.
@@ -112,8 +112,8 @@ Register `com.studio.mygame://tarkov-companion-auth` on the server.
 - **Refresh:** done 30 seconds before the access token expires, once for all
   the requests waiting on it. A 401 gets one refresh and one retry. Only an
   answer that says the refresh token is no good signs the player out:
-  `400 invalid_grant` or `401`. With no network, a rate limit (`429`), any
-  other `4xx` or a server error, the player stays signed in and the next
+  `400 invalid_grant` or `401`. After a network failure, a rate limit (`429`),
+  any other `4xx` or a server error, the player stays signed in and the next
   request tries the refresh again, so an incident on the identity server
   doesn't sign everyone out.
 - **Token lifetime:** an `expires_in` that is negative reads as "already

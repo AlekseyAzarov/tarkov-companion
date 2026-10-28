@@ -12,7 +12,7 @@ Integration issues seen while building the sample host, with symptoms first. If 
 2. A sideloaded split APK set is missing its ABI split. Install the full set (`bundletool install-apks`).
 3. Your R8 config dropped the SDK's consumer rules (custom `proguardFiles` that replace rather than add). `JNI_OnLoad` then can't find `NativeBridge` by name. Symptom in logcat: `JNI_ERR returned from JNI_OnLoad`.
 
-The SDK never loads the library in `initialize()`: on the first lookup, or, with remote flags or sign-in configured, on a background thread once the main thread first goes idle. A missing library is reported as this error code, never as a crash of your startup.
+The SDK never loads the library in `initialize()`: it loads it on the first lookup or, with remote flags or sign-in configured, on a background thread once the main thread first goes idle. A missing library is reported as this error code, never as a crash of your startup.
 
 ## Calling the SDK from a native thread fails with `ClassNotFoundException`
 
@@ -28,11 +28,11 @@ A translucent activity with a fixed `screenOrientation` crashes on API 26 (`Only
 
 ## The whole game dies when the overlay crashes
 
-It shouldn't: the SDK handles `onRenderProcessGone` and closes the overlay, analytics event `companion_renderer_gone`. If your game still dies, check whether *your own* WebViews elsewhere lack that override: a renderer crash kills the host process for every WebView without it.
+It shouldn't: the SDK handles `onRenderProcessGone`, closes the overlay and reports the analytics event `companion_renderer_gone`. If your game still dies, check whether *your own* WebViews elsewhere lack that override: a renderer crash kills the host process for every WebView without it.
 
 ## "Prices may be outdated" banner
 
-The response came from the offline cache (network failed or tarkov.dev was down) or is older than `priceTimeToLiveSeconds` (default 15 min). The `search_completed` / `verdict_shown` events carry `from_cache`. Persistent? Check whether your `HttpTransport` returns non-2xx for the endpoint.
+The response came from the offline cache (the network failed or tarkov.dev was down) or is older than `priceTimeToLiveSeconds` (default 15 min). The `search_completed` / `verdict_shown` events carry `from_cache`. Persistent? Check whether your `HttpTransport` returns non-2xx for the endpoint.
 
 ## `schema_mismatch` errors
 

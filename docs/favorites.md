@@ -46,13 +46,13 @@ the verdict. Both appear on their own.
 
 ## When it syncs
 
-After the list loads (at start, or after a sign-in), and after every change.
+The list syncs after it loads (at start, or after a sign-in) and after every change.
 There is no background schedule: nothing wakes the device for favourites.
 Changes made offline wait in a queue on disk and go with the next sync, which
 is also tried whenever the overlay opens or the host reads the list while
 changes are waiting, so they don't wait for the next change or start.
-A failed sync is logged, at debug level for no network and as a warning for
-an HTTP error, and the change stays queued.
+A failed sync is logged, at debug level when there is no network and as a
+warning for an HTTP error, and the change stays queued.
 
 ## What your server needs
 
@@ -82,8 +82,9 @@ POST {favoritesSyncUrl}
   client sent, whether its change won or not.
 - **Refusing a change:** answer with your record for that item, or
   `"favorite": false` if there is none. The client takes what you return.
-  Reasonable refusals are: over the limit, and `changedAt` far in the future
-  (a device with a wrong clock would otherwise win every conflict).
+  Reasonable grounds for refusal: the list is over the limit, or `changedAt`
+  is far in the future (a device with a wrong clock would otherwise win every
+  conflict).
 - **Names:** store what the client sends and return it. A record without
   names keeps the ones the device already has.
 
