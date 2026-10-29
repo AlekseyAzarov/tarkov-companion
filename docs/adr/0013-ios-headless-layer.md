@@ -79,6 +79,9 @@ and on the iOS simulator, and builds for devices.
   Kotlin that also cover the overlay, sign-in and favourites.
 - The same rules (queries, cache policy, fallbacks to the cache and the
   catalog) run on both platforms by construction.
+- The core linked for arm64 devices is 230 KB, against 322 KB for the
+  Android library, which carries its own libc++
+  ([footprint.md](../footprint.md#on-ios)).
 - Async Swift can't be called from Objective-C or C++. A game calling from
   Unreal or Objective-C++ would need a completion-handler variant or a thin
   C entry point.
