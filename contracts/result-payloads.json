@@ -1,6 +1,6 @@
 {
-  "$comment": "Field names and values of the payloads the core answers requests with: search, recommend, favourites list and sign-in. The same payloads reach the headless Kotlin API (session results) and the page (bridge results); their shapes are documented in core/include/tarkov_companion/tarkov_companion.h and pinned by contracts/fixtures/core_recommendation.json.",
-  "generate": { "cpp": "payload", "kotlin": "PAYLOAD", "typescript": "Payload" },
+  "$comment": "Field names and values of the payloads the core answers requests with: search, recommend, favourites list and sign-in. The same payloads reach the headless Kotlin and Swift APIs (session results) and the page (bridge results); their shapes are documented in core/include/tarkov_companion/tarkov_companion.h and pinned by contracts/fixtures/core_recommendation.json.",
+  "generate": { "cpp": "payload", "kotlin": "PAYLOAD", "typescript": "Payload", "swift": "payload" },
   "names": {
     "Field": [
       "items",

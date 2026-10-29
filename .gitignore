@@ -24,3 +24,9 @@ run-emulator.bat
 
 # Generated from contracts/ by scripts/generate-web-contract.mjs
 web-ui/src/generated/
+
+# sdk-ios: SwiftPM state, the core built by scripts/build-ios-core.sh, constants from scripts/generate-swift-contract.mjs
+sdk-ios/.build/
+sdk-ios/.swiftpm/
+sdk-ios/Frameworks/
+sdk-ios/Sources/TarkovCompanion/Generated/

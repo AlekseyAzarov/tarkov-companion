@@ -1,6 +1,6 @@
 # Tarkov Companion SDK
 
-An embeddable Android SDK, with a headless iOS layer over the same core on a separate branch, that answers one question for an Escape from Tarkov player, from inside a game, in a few seconds:
+An embeddable Android SDK, with a headless iOS layer over the same core, that answers one question for an Escape from Tarkov player, from inside a game, in a few seconds:
 
 > **"Should I sell this item, and where — or keep it?"**
 
@@ -55,7 +55,7 @@ The verdict accounts for:
 
 Everything that knows about tarkov.dev, the web UI's protocol, the remote flags, the sign-in flow, favourites sync or the fallback catalog is in the core. The platform layer only executes what the core asks for, carries the page's messages unread, and owns the WebView and the screen's lifecycle. That is what makes a second platform cheap ([ADR 0006](docs/adr/0006-sans-io-session.md), [0007](docs/adr/0007-bridge-protocol-in-core.md), [0008](docs/adr/0008-remote-flags-and-analytics-catalog.md), [0009](docs/adr/0009-sign-in.md), [0010](docs/adr/0010-favorites-sync.md), [0011](docs/adr/0011-static-catalog.md)).
 
-**iOS** (on the [`ios` branch](https://github.com/AlekseyAzarov/tarkov-companion/tree/ios/); [guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)): a Swift package runs the same core, unchanged, built as an XCFramework. It offers the headless API (search and verdicts, with the offline cache and the catalog fallback) and is tested in CI on the iOS simulator against the same recorded responses and golden verdict as Android. The overlay, sign-in and favourites are Android-only so far. It lives on its own branch and is not merged into `main`.
+**iOS** ([guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)): a Swift package runs the same core, unchanged, built as an XCFramework. It offers the headless API (search and verdicts, with the offline cache and the catalog fallback) and is tested in CI on the iOS simulator against the same recorded responses and golden verdict as Android. The overlay, sign-in and favourites are Android-only so far.
 
 **Sign-in** ([guide](docs/auth.md)): players sign in with the game's own identity server over OAuth 2.0 with PKCE, in the system browser, never in the SDK's WebView. Tokens are refreshed and rotated in the core, kept encrypted under an Android Keystore key, and never reach the web page, the logs or analytics.
 
@@ -70,7 +70,7 @@ Everything that knows about tarkov.dev, the web UI's protocol, the remote flags,
 | [`web-ui/`](web-ui) | Preact + TypeScript flow shown in the WebView, typed bridge client, vitest |
 | [`bff/`](bff) | Development backend: a minimal OAuth 2.0 authorization server (PKCE, rotating refresh tokens) and a favourites sync endpoint, for trying both end to end. Node built-ins only; not for production |
 | [`host-game/`](host-game) | Sample "game": C++ render loop on NativeActivity, two flavors for footprint diffs |
-| [`sdk-ios/`](https://github.com/AlekseyAzarov/tarkov-companion/tree/ios/sdk-ios) (`ios` branch) | Swift package: the headless API on the core's XCFramework, session driver, disk stores, XCTest suite |
+| [`sdk-ios/`](sdk-ios) | Swift package: the headless API on the core's XCFramework, session driver, disk stores, XCTest suite |
 | [`experiments/flutter_overlay/`](experiments/flutter_overlay) | The same screen in Flutter, built only to measure it against the WebView ([ADR 0002](docs/adr/0002-webview-vs-flutter.md)); not part of the SDK or CI |
 | [`contracts/`](contracts) | GraphQL queries, settings limits and the analytics event catalog (single source for C++/Kotlin codegen and the live check), recorded fixtures |
 | [`docs/`](docs) | ADRs, integration guide, troubleshooting, bridge protocol, analytics, footprint |
@@ -175,7 +175,7 @@ I built this with Claude Code, an AI coding agent. The split was deliberate: I d
 - Tests: the GoogleTest, JVM, instrumented and vitest suites, the fakes and the fixtures.
 - Much of the research: how tarkov.dev's API and datasets are shaped, the OAuth and Android platform specifics behind my decisions (RFC 8252, Keystore, WebView messaging), the options weighed in the ADRs.
 - Supporting modules and tooling: the JSON parser and writer, the codegen from `contracts/`, Gradle and CMake tasks, the web UI's markup and styles, the browser mock bridge for development, the development backend in `bff/`.
-- The iOS layer on the `ios` branch: the XCFramework build of the core, the Swift package and its tests, the macOS CI job. With no Mac available, it was compiled and tested only in CI.
+- The iOS layer: the XCFramework build of the core, the Swift package and its tests, the macOS CI job. With no Mac available, it was compiled and tested only in CI.
 - The Flutter comparison: the same screen in Flutter (`experiments/flutter_overlay`), the `withFlutter` build of the sample game, the measuring scripts and the measurements in ADR 0002. Measuring it showed that the WebView's renderer process had never been counted, which turned the memory comparison around.
 
 **Where I caught the agent's mistakes**

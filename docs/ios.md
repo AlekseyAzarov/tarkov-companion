@@ -1,12 +1,11 @@
 # iOS (headless)
 
-For iOS game and app teams. The Swift package [`sdk-ios`](https://github.com/AlekseyAzarov/tarkov-companion/tree/ios/sdk-ios) runs
+For iOS game and app teams. The Swift package [`sdk-ios`](../sdk-ios) runs
 the same C++ core as Android and offers its headless API: search and verdicts,
 with the offline cache and the catalog fallback. The overlay, sign-in and
 favourites are Android-only for now ([ADR 0013](adr/0013-ios-headless-layer.md)).
 
-Requires iOS 15 (macOS 12 for tests). The code is on the [`ios` branch](https://github.com/AlekseyAzarov/tarkov-companion/tree/ios/),
-not in `main`: check it out to build it.
+Requires iOS 15 (macOS 12 for tests).
 
 ## 1. Build the core and add the package
 

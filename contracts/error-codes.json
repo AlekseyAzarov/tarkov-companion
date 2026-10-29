@@ -1,6 +1,6 @@
 {
-  "$comment": "Error codes the core reports. `ErrorCode`: why a request failed, in a failed session result (error.code) and in a bridge error the page gets. `BridgeErrorCode`: why the bridge refused a message from the page. The page shows a message per code (web-ui/src/ui/ErrorNote.tsx); the Kotlin SDK maps ErrorCode onto its public ErrorCode enum.",
-  "generate": { "cpp": "", "kotlin": "", "typescript": "" },
+  "$comment": "Error codes the core reports. `ErrorCode`: why a request failed, in a failed session result (error.code) and in a bridge error the page gets. `BridgeErrorCode`: why the bridge refused a message from the page. The page shows a message per code (web-ui/src/ui/ErrorNote.tsx); the Kotlin SDK maps ErrorCode onto its public ErrorCode enum, the Swift SDK onto CompanionError.Code.",
+  "generate": { "cpp": "", "kotlin": "", "typescript": "", "swift": "" },
   "names": {
     "ErrorCode": [
       "invalid_argument",

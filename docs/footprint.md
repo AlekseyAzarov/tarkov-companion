@@ -72,7 +72,7 @@ The core is built with `-fno-exceptions` and the C API never lets one escape, so
 
 The same core linked for arm64 iOS devices, dead-stripped, with only the C API
 exported: **230 KB** (2026-10-29, Xcode on the CI's macOS runner,
-[`scripts/build-ios-core.sh`](https://github.com/AlekseyAzarov/tarkov-companion/blob/ios/scripts/build-ios-core.sh)). The Android arm64
+[`scripts/build-ios-core.sh`](../scripts/build-ios-core.sh)). The Android arm64
 library is 322 KB, but about 53 KB of that is libc++ and libunwind, which an iOS
 app takes from the system, and part of the rest is the JNI glue. The Swift
 layer's own code comes on top; measuring it needs an app build.

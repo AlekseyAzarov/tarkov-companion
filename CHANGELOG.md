@@ -2,6 +2,11 @@
 
 All notable changes to the SDK. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [semver](https://semver.org/). Public API changes are also visible in `sdk-android/api/sdk-android.api`.
 
+## [Unreleased]
+
+### Added
+- iOS: a Swift package (`sdk-ios`) with the headless API, search and verdicts with the offline cache and the catalog fallback, on the same core built as an XCFramework ([iOS guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)).
+
 ## [0.1.0] - 2026-10-28
 
 ### Added

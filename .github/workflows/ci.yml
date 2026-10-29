@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, ios]
   pull_request:
 
 concurrency:
@@ -99,6 +99,35 @@ jobs:
             host-game/build/outputs/apk/**/*.apk
             sdk-android/build/reports/tests/
             build/reports/footprint.md
+
+  ios:
+    name: iOS SDK (Swift)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compiler errors and failed tests as annotations
+        run: echo "::add-matcher::.github/matchers/compiler-errors.json"
+      - name: Contract constants for Swift
+        run: node scripts/generate-swift-contract.mjs
+      - name: Core as an XCFramework (iOS device, iOS simulator, macOS)
+        run: |
+          echo '### iOS core' >> "$GITHUB_STEP_SUMMARY"
+          bash scripts/build-ios-core.sh | tee -a "$GITHUB_STEP_SUMMARY" | tee "$RUNNER_TEMP/ios-core-sizes.txt"
+          echo "::notice title=iOS core sizes::$(paste -sd ';' "$RUNNER_TEMP/ios-core-sizes.txt")"
+      - name: Tests on macOS
+        working-directory: sdk-ios
+        run: swift test
+      - name: Tests on the iOS simulator
+        working-directory: sdk-ios
+        run: |
+          simulator=$(xcrun simctl list devices available | grep -m1 'iPhone' | grep -oE '[0-9A-F]{8}(-[0-9A-F]{4}){3}-[0-9A-F]{12}')
+          xcodebuild test -scheme TarkovCompanion -destination "id=$simulator" -quiet
+      - name: Build for iOS devices
+        working-directory: sdk-ios
+        run: xcodebuild build -scheme TarkovCompanion -destination 'generic/platform=iOS' -quiet
 
   device:
     name: On-device tests (emulator)
