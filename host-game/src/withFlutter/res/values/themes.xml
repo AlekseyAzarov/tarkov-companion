@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The SDK's tarkov_companion_Overlay theme, minus the scrim: FlutterActivity clears a transparent
+         activity's window background, so the Dart screen draws the scrim itself. -->
+    <style name="FlutterOverlay" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

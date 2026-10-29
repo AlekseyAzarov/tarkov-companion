@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!-- Declared like the SDK's CompanionActivity, so the two overlays are measured under the same conditions. -->
+        <activity
+            android:name=".FlutterOverlayActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:enableOnBackInvokedCallback="true"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:theme="@style/FlutterOverlay"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            tools:targetApi="33" />
+    </application>
+</manifest>

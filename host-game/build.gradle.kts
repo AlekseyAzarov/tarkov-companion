@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+val flutterOverlayBuilt = rootProject.file("experiments/flutter_overlay/build/host/outputs/repo").isDirectory
+
 android {
     namespace = "com.tarkovcompanion.hostgame"
     compileSdk = 36
@@ -35,6 +37,14 @@ android {
             dimension = "integration"
             applicationIdSuffix = ".baseline"
         }
+        // withSdk with a Flutter screen instead of the WebView overlay (ADR 0002). Only
+        // when its AARs are built, so the usual build and CI don't need Flutter.
+        if (flutterOverlayBuilt) {
+            create("withFlutter") {
+                dimension = "integration"
+                applicationIdSuffix = ".flutter"
+            }
+        }
     }
 
     buildTypes {
@@ -57,6 +67,12 @@ android {
     sourceSets {
         // Recorded API responses for the debug-only fixture fallback (DemoSupport).
         getByName("debug").assets.srcDir(rootProject.file("contracts"))
+
+        // Variant source sets are made after this script runs; their Implementation configurations are needed below.
+        if (flutterOverlayBuilt) {
+            maybeCreate("withFlutterDebug")
+            maybeCreate("withFlutterRelease")
+        }
     }
 
     compileOptions {
@@ -73,4 +89,10 @@ kotlin {
 
 dependencies {
     "withSdkImplementation"(project(":sdk-android"))
+
+    if (flutterOverlayBuilt) {
+        "withFlutterImplementation"(project(":sdk-android"))
+        "withFlutterDebugImplementation"("com.tarkovcompanion.flutter_overlay:flutter_debug:1.0")
+        "withFlutterReleaseImplementation"("com.tarkovcompanion.flutter_overlay:flutter_release:1.0")
+    }
 }

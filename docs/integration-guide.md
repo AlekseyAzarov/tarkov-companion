@@ -73,7 +73,9 @@ The overlay is a translucent activity: your activity receives `onPause`/focus lo
 
 ### Opening fast
 
-The first open in a process starts the WebView engine: on the emulator the overlay is ready about 650 ms after the tap, against 250 ms for later opens. `TarkovCompanion.prewarm()` does that work ahead of time and brings the first open to about 450 ms. It costs a pause of the main thread (about 230 ms) when called, and about 45 MB of memory for the rest of the process, so call it when the player is likely to open the companion, as the menu with its button opens, not at game start. Numbers: [footprint.md](footprint.md#opening-the-overlay).
+The first open in a process starts the WebView engine: on the emulator the overlay is ready about 490 ms after the tap, against 130–160 ms for later opens. `TarkovCompanion.prewarm()` does that work ahead of time and brings the first open to about 365 ms. It costs a pause of the main thread (about 230 ms) when called, and about 50 MB of memory for the rest of the process, so call it when the player is likely to open the companion, as the menu with its button opens, not at game start. Numbers: [footprint.md](footprint.md#opening-the-overlay).
+
+Once opened, the overlay keeps about 140 MB for the rest of the session, in your process and in the WebView's renderer process ([footprint.md](footprint.md#memory)). On low-memory devices, consider the headless API with your own UI instead.
 
 ### From C++
 

@@ -1,0 +1,25 @@
+name: flutter_overlay
+description: "The item lookup screen in Flutter, to measure it against the WebView overlay (ADR 0002)."
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  # The screen draws its glyphs as text, like the web flow, so the Material icon font isn't bundled.
+  uses-material-design: false
+
+  module:
+    androidX: true
+    androidPackage: com.tarkovcompanion.flutter_overlay
+    iosBundleIdentifier: com.tarkovcompanion.flutterOverlay

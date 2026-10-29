@@ -68,6 +68,7 @@ Everything that knows about tarkov.dev, the web UI's protocol, the remote flags,
 | [`web-ui/`](web-ui) | Preact + TypeScript flow shown in the WebView, typed bridge client, vitest |
 | [`bff/`](bff) | Development backend: a minimal OAuth 2.0 authorization server (PKCE, rotating refresh tokens) and a favourites sync endpoint, for trying both end to end. Node built-ins only; not for production |
 | [`host-game/`](host-game) | Sample "game": C++ render loop on NativeActivity, two flavors for footprint diffs |
+| [`experiments/flutter_overlay/`](experiments/flutter_overlay) | The same screen in Flutter, built only to measure it against the WebView ([ADR 0002](docs/adr/0002-webview-vs-flutter.md)); not part of the SDK or CI |
 | [`contracts/`](contracts) | GraphQL queries, settings limits and the analytics event catalog (single source for C++/Kotlin codegen and the live check), recorded fixtures |
 | [`docs/`](docs) | ADRs, integration guide, troubleshooting, bridge protocol, analytics, footprint |
 
@@ -97,7 +98,7 @@ The complete sample integration is [one file](host-game/src/withSdk/kotlin/com/t
 - The overlay survives rotation, process death (restores the open item), WebView renderer crashes (the game keeps running), missing WebView providers, and follows the game's orientation.
 - Offline: the last good response is served and labelled with its age; a kill switch persists across cold starts without network ([remote flags](docs/remote-flags.md)).
 
-**Small** ([details](docs/footprint.md)): ≈ 375 KB per arm64 device (about 200 KB of it is the session, bridge, flags, sign-in, favourites and catalog logic that would otherwise be rewritten per platform). Found that 118 KB of the native library was libc++abi's demangler and removed it (288 → 117 KB). Memory: +1 MB until the overlay opens; +68 MB while it's open (WebView), weighed in [ADR 0002](docs/adr/0002-webview-vs-flutter.md).
+**Small** ([details](docs/footprint.md)): ≈ 375 KB per arm64 device (about 200 KB of it is the session, bridge, flags, sign-in, favourites and catalog logic that would otherwise be rewritten per platform). Found that 118 KB of the native library was libc++abi's demangler and removed it (288 → 117 KB). Memory: +1 MB until the overlay opens; about +140 MB once it has opened (the WebView in the game's process and its renderer process), measured against a Flutter build of the same screen in [ADR 0002](docs/adr/0002-webview-vs-flutter.md).
 
 **Security of the web boundary** ([ADR 0004](docs/adr/0004-web-message-channel.md)): no `addJavascriptInterface`; origin-checked `MessageChannel`; CSP with `connect-src 'none'`; all navigation blocked; every message size-capped and validated on both sides.
 
@@ -149,7 +150,6 @@ Debug builds of the sample game fall back to the recorded fixtures when tarkov.d
 
 ## Not done yet
 
-- A Flutter version of the same screen, to replace the typical-number column in ADR 0002 with measurements.
 - iOS: a Swift layer would be an executor like `SessionDriver` (URLSession, a cache directory, a dispatch queue) plus a `WKWebView` carrying messages; nothing exists yet.
 
 ## How AI tools were used
@@ -171,6 +171,7 @@ I built this with Claude Code, an AI coding agent. The split was deliberate: I d
 - Tests: the GoogleTest, JVM, instrumented and vitest suites, the fakes and the fixtures.
 - Much of the research: how tarkov.dev's API and datasets are shaped, the OAuth and Android platform specifics behind my decisions (RFC 8252, Keystore, WebView messaging), the options weighed in the ADRs.
 - Supporting modules and tooling: the JSON parser and writer, the codegen from `contracts/`, Gradle and CMake tasks, the web UI's markup and styles, the browser mock bridge for development, the development backend in `bff/`.
+- The Flutter comparison: the same screen in Flutter (`experiments/flutter_overlay`), the `withFlutter` build of the sample game, the measuring scripts and the measurements in ADR 0002. Measuring it showed that the WebView's renderer process had never been counted, which turned the memory comparison around.
 
 **Where I caught the agent's mistakes**
 
