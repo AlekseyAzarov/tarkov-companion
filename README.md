@@ -55,7 +55,7 @@ The verdict accounts for:
 
 Everything that knows about tarkov.dev, the web UI's protocol, the remote flags, the sign-in flow, favourites sync or the fallback catalog is in the core. The platform layer only executes what the core asks for, carries the page's messages unread, and owns the WebView and the screen's lifecycle. That is what makes a second platform cheap ([ADR 0006](docs/adr/0006-sans-io-session.md), [0007](docs/adr/0007-bridge-protocol-in-core.md), [0008](docs/adr/0008-remote-flags-and-analytics-catalog.md), [0009](docs/adr/0009-sign-in.md), [0010](docs/adr/0010-favorites-sync.md), [0011](docs/adr/0011-static-catalog.md)).
 
-**iOS** ([guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)): a Swift package runs the same core, unchanged, built as an XCFramework. It offers the headless API (search and verdicts, with the offline cache and the catalog fallback) and is tested in CI on the iOS simulator against the same recorded responses and golden verdict as Android. The overlay, sign-in and favourites are Android-only so far.
+**iOS** ([guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)): a Swift package runs the same core, unchanged, built as an XCFramework. It offers the headless API (search and verdicts, with the offline cache and the catalog fallback) and is tested in CI on the iOS simulator against the same recorded responses and golden verdict as Android. The overlay, sign-in and favourites stay Android-only ([Not done yet](#not-done-yet)).
 
 **Sign-in** ([guide](docs/auth.md)): players sign in with the game's own identity server over OAuth 2.0 with PKCE, in the system browser, never in the SDK's WebView. Tokens are refreshed and rotated in the core, kept encrypted under an Android Keystore key, and never reach the web page, the logs or analytics.
 
@@ -150,9 +150,11 @@ Debug builds of the sample game fall back to the recorded fixtures when tarkov.d
 - [0010 — Favourites, local first, synced through the core](docs/adr/0010-favorites-sync.md)
 - [0011 — A static catalog when tarkov.dev's GraphQL API is down](docs/adr/0011-static-catalog.md)
 - [0012 — The overlay is an activity of its own, not a view in the game's window](docs/adr/0012-overlay-activity.md)
-- [0013 — An iOS layer over the same core, headless first](docs/adr/0013-ios-headless-layer.md)
+- [0013 — An iOS layer over the same core, headless only](docs/adr/0013-ios-headless-layer.md)
 
 ## Not done yet
+
+Not planned: beyond the scope of this project.
 
 - iOS beyond the headless API: the overlay in a `WKWebView` (which has no `MessagePort` to hand to the page, so the bridge needs another transport), sign-in with `ASWebAuthenticationSession` and the Keychain, favourites.
 

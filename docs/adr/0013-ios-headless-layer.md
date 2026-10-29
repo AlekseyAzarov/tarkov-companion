@@ -1,4 +1,4 @@
-# ADR 0013: An iOS layer over the same core, headless first
+# ADR 0013: An iOS layer over the same core, headless only
 
 **Status:** accepted · 2026-10 · builds on [ADR 0001](0001-cpp-core.md) and [ADR 0006](0006-sans-io-session.md)
 
@@ -52,9 +52,10 @@ enum, so new codes are not a breaking change. `PlayerProfile` validates in a
 throwing initializer instead of a builder. Nothing in the API crashes the
 game on bad input.
 
-### Headless first
+### Headless only
 
-Left out for now, each needing work of its own on iOS:
+Left out, each needing work of its own on iOS, and beyond the scope of this
+project:
 
 - the overlay: a `WKWebView` carrying the bridge protocol, which on iOS has no
   `MessagePort` to hand to the page;

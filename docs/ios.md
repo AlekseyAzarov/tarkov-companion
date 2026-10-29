@@ -3,7 +3,8 @@
 For iOS game and app teams. The Swift package [`sdk-ios`](../sdk-ios) runs
 the same C++ core as Android and offers its headless API: search and verdicts,
 with the offline cache and the catalog fallback. The overlay, sign-in and
-favourites are Android-only for now ([ADR 0013](adr/0013-ios-headless-layer.md)).
+favourites are Android-only, and bringing them to iOS is beyond the scope of
+this project ([ADR 0013](adr/0013-ios-headless-layer.md)).
 
 Requires iOS 15 (macOS 12 for tests).
 
