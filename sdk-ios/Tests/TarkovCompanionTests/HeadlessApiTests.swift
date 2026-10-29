@@ -70,7 +70,8 @@ final class HeadlessApiTests: XCTestCase {
         }
     }
 
-    func testVerdictComesFromTheDiskCacheAfterARestartWithoutNetwork() async throws {
+    // After a restart the item is only on disk under its search, so the player searches again, as in the UI.
+    func testSearchAndVerdictComeFromTheDiskCacheAfterARestartWithoutNetwork() async throws {
         let storageDirectories = Fixtures.temporaryStorageDirectories()
         let online = makeRuntime(transport: FixtureTransport(), storageDirectories: storageDirectories)
         _ = try await online.searchItems("graphics")
@@ -83,6 +84,8 @@ final class HeadlessApiTests: XCTestCase {
             storageDirectories: storageDirectories,
             priceTimeToLiveSeconds: 0
         )
+        let cachedItems = try await restarted.searchItems("graphics")
+        XCTAssertTrue(cachedItems.contains { item in item.id == Self.graphicsCardId })
         let cached = try await restarted.recommendation(forItemId: Self.graphicsCardId)
 
         XCTAssertFalse(offlineTransport.receivedRequests.isEmpty, "the restarted SDK tried the network first")
