@@ -67,16 +67,28 @@ TEST(Engine, ConcurrentParseAndRecommendIsSafe) {
   const std::string items = test::readFixture("item_search.json");
   const std::string hideout = test::readFixture("hideout.json");
   std::atomic<int> answers{0};
+  std::atomic<int> writersRunning{kThreadCount / 2};
 
   std::vector<std::thread> threads;
   for (int threadIndex = 0; threadIndex < kThreadCount; ++threadIndex) {
     const bool isWriter = threadIndex % 2 == 0;
     threads.emplace_back([&, isWriter] {
-      for (int iteration = 0; iteration < kIterationsPerThread; ++iteration) {
-        if (isWriter) {
+      if (isWriter) {
+        for (int iteration = 0; iteration < kIterationsPerThread; ++iteration) {
           engine.parseAndStoreItems(items, nullptr);
           engine.parseAndStoreHideout(hideout);
-        } else if (engine.recommend(kGraphicsCardId, {})) {
+        }
+        --writersRunning;
+        return;
+      }
+
+      // Readers keep going until the writers are done, then read once more:
+      // under the sanitizers parsing is slow enough for a fixed number of
+      // reads to finish before the first item is stored.
+      bool writersWereRunning = true;
+      while (writersWereRunning) {
+        writersWereRunning = writersRunning.load() > 0;
+        if (engine.recommend(kGraphicsCardId, {})) {
           ++answers;
         }
       }
