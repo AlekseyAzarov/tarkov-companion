@@ -4,7 +4,7 @@
       "owner": "compiler-errors",
       "pattern": [
         {
-          "regexp": "^(.+?):(\d+):(?:(\d+):)? (error): (.+)$",
+          "regexp": "^(.+?):(\\d+):(?:(\\d+):)? (error): (.+)$",
           "file": 1,
           "line": 2,
           "column": 3,
