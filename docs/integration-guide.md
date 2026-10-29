@@ -1,6 +1,7 @@
 # Integration guide
 
-For game and app teams embedding the Tarkov Companion SDK.
+For game and app teams embedding the Tarkov Companion SDK on Android. On iOS
+there is the headless API so far: [ios.md](ios.md).
 
 ## 1. Add the dependency
 

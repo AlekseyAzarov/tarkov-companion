@@ -68,6 +68,15 @@ The core is built with `-fno-exceptions` and the C API never lets one escape, so
 - **Preact** for the web flow, with a 25 KB gzip budget enforced by `web-ui/build.mjs` (currently 10.5 KB).
 - **16 KB page alignment** (`-z max-page-size=16384`) so the library loads on Android 15+ devices with 16 KB pages.
 
+### On iOS
+
+The same core linked for arm64 iOS devices, dead-stripped, with only the C API
+exported: **230 KB** (2026-10-29, Xcode on the CI's macOS runner,
+[`scripts/build-ios-core.sh`](https://github.com/AlekseyAzarov/tarkov-companion/blob/ios/scripts/build-ios-core.sh)). The Android arm64
+library is 322 KB, but about 53 KB of that is libc++ and libunwind, which an iOS
+app takes from the system, and part of the rest is the JNI glue. The Swift
+layer's own code comes on top; measuring it needs an app build.
+
 ## Startup
 
 `initialize()` does no I/O and doesn't load the native library. Without a flags URL or sign-in the library loads on the first lookup; with either, on a background thread once the main thread first goes idle, because the remote flags and the stored sign-in live in the core ([ADR 0008](adr/0008-remote-flags-and-analytics-catalog.md)). `initialize()` is wrapped in a `Trace` section, so its exact cost is visible in a Perfetto/systrace capture as `TarkovCompanion.initialize`.
