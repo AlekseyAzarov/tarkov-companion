@@ -49,7 +49,7 @@ else()
   target_compile_options(tarkov_companion_core PRIVATE -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wno-sign-conversion)
 endif()
 
-if(ANDROID)
+if(ANDROID OR IOS)
   # Size matters more than speed for code that runs once per lookup.
   target_compile_options(tarkov_companion_core PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
 endif()

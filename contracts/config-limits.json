@@ -1,5 +1,5 @@
 {
-  "$comment": "Single source of the keys of the session settings documents, their limits and defaults, and constants the core and the platform SDKs share. Generated into C++ by core/cmake/contract.cmake and into Kotlin by buildSrc/GenerateContractSourcesTask.kt. Keys of \"config\", \"profile\" and \"bridgeOptions\" are the JSON keys of tarkov_companion_session_create, tarkov_companion_session_set_profile and tarkov_companion_session_open_bridge.",
+  "$comment": "Single source of the keys of the session settings documents, their limits and defaults, and constants the core and the platform SDKs share. Generated into C++ by core/cmake/contract.cmake, into Kotlin by buildSrc/GenerateContractSourcesTask.kt and into Swift by scripts/generate-swift-contract.mjs. Keys of \"config\", \"profile\" and \"bridgeOptions\" are the JSON keys of tarkov_companion_session_create, tarkov_companion_session_set_profile and tarkov_companion_session_open_bridge.",
   "config": {
     "endpoint": { "default": "https://api.tarkov.dev/graphql", "requiredPrefix": "https://" },
     "language": { "default": "en", "length": 2 },

@@ -1,6 +1,6 @@
 {
-  "$comment": "Wire names of the actions the core session hands to the platform (tarkov_companion_session_next_action; their shapes are documented in core/include/tarkov_companion/tarkov_companion.h). The core writes them, the platform SDKs read them. Like every names contract here, `names` maps a group to its wire names and `generate` gives the prefix each language uses: core/cmake/contract.cmake (C++), buildSrc/GenerateContractSourcesTask.kt (Kotlin), scripts/generate-web-contract.mjs (TypeScript).",
-  "generate": { "cpp": "action", "kotlin": "ACTION" },
+  "$comment": "Wire names of the actions the core session hands to the platform (tarkov_companion_session_next_action; their shapes are documented in core/include/tarkov_companion/tarkov_companion.h). The core writes them, the platform SDKs read them. Like every names contract here, `names` maps a group to its wire names and `generate` gives the prefix each language uses: core/cmake/contract.cmake (C++), buildSrc/GenerateContractSourcesTask.kt (Kotlin), scripts/generate-web-contract.mjs (TypeScript), scripts/generate-swift-contract.mjs (Swift).",
+  "generate": { "cpp": "action", "kotlin": "ACTION", "swift": "action" },
   "names": {
     "Type": [
       "http",
