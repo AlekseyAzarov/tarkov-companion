@@ -466,8 +466,8 @@ void Authentication::sendWithCurrentToken(HttpRequest request, bool alreadyRetri
                                                           http::kBearerAuthorizationPrefix + m_tokens->accessToken);
   uint64_t generation = m_generation;
 
-  m_host.sendRequest(std::move(withToken), [this, request, done, generation,
-                                               alreadyRetried](const HttpOutcome& response) {
+  m_host.sendRequest(std::move(withToken), [this, request = std::move(request), done = std::move(done), generation,
+                                               alreadyRetried](const HttpOutcome& response) mutable {
     if (response.statusCode == kNoResponse) {
       done(Failure{ErrorCode::Network, "network unavailable: " + std::string(response.body)}, response);
       return;
@@ -488,7 +488,8 @@ void Authentication::sendWithCurrentToken(HttpRequest request, bool alreadyRetri
       return;
     }
 
-    withFreshToken(true, [this, request, done](std::optional<Failure> failure) mutable {
+    withFreshToken(true, [this, request = std::move(request),
+                          done = std::move(done)](std::optional<Failure> failure) mutable {
       if (failure) {
         done(failure, HttpOutcome{});
         return;

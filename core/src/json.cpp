@@ -28,7 +28,14 @@ constexpr unsigned char kFirstCharacterNotNeedingEscape = 0x20;
 // digits so a hostile "1e99999999999" can't overflow the int.
 constexpr int kExponentLimit = 10000;
 
-constexpr double kLargestExactlyRepresentableInteger = 9.0e18;
+// A double holds about 17 significant digits. Digits past this limit are
+// dropped (integer ones still scale the value), so a long number can't push
+// the mantissa to infinity.
+constexpr int kSignificantDigitLimit = 19;
+
+// Just under INT64_MAX (about 9.22e18): a double beyond it can't be cast to
+// int64_t. Above 2^53 doubles are whole but no longer exact; the cast stays safe.
+constexpr double kSafeInt64CastLimit = 9.0e18;
 
 // "%.6g": enough for every double the core writes (ratios, not prices).
 constexpr const char* kDoubleFormat = "%.6g";
@@ -344,15 +351,30 @@ class Parser {
     }
 
     double mantissa = 0;
+    int significantDigits = 0;
+    int decimalShift = 0;
+    auto appendToMantissa = [&](char digit) {
+      if (significantDigits == kSignificantDigitLimit) {
+        return false;
+      }
+      mantissa = mantissa * 10 + (digit - '0');
+      if (mantissa != 0) {
+        ++significantDigits;
+      }
+
+      return true;
+    };
+
     if (currentCharacter() == '0') {
       ++m_position;  // a leading zero can't be followed by more digits
     } else {
       while (text::isDigit(currentCharacter())) {
-        mantissa = mantissa * 10 + (m_text[m_position++] - '0');
+        if (!appendToMantissa(m_text[m_position++])) {
+          ++decimalShift;
+        }
       }
     }
 
-    int fractionDigits = 0;
     if (currentCharacter() == '.') {
       ++m_position;
       if (!text::isDigit(currentCharacter())) {
@@ -360,8 +382,9 @@ class Parser {
         return false;
       }
       while (text::isDigit(currentCharacter())) {
-        mantissa = mantissa * 10 + (m_text[m_position++] - '0');
-        ++fractionDigits;
+        if (appendToMantissa(m_text[m_position++])) {
+          --decimalShift;
+        }
       }
     }
 
@@ -372,7 +395,8 @@ class Parser {
       }
     }
 
-    double magnitude = mantissa * std::pow(10.0, exponent - fractionDigits);
+    // A zero mantissa stays zero: "0e400" would otherwise be 0 * inf, a NaN.
+    double magnitude = mantissa == 0 ? 0 : mantissa * std::pow(10.0, exponent + decimalShift);
     output = JsonValue::makeNumber(negative ? -magnitude : magnitude);
 
     return true;
@@ -454,7 +478,7 @@ int64_t JsonValue::asInteger(int64_t fallback) const {
   if (!isNumber() || !std::isfinite(m_number)) {
     return fallback;
   }
-  if (m_number > kLargestExactlyRepresentableInteger || m_number < -kLargestExactlyRepresentableInteger) {
+  if (m_number > kSafeInt64CastLimit || m_number < -kSafeInt64CastLimit) {
     return fallback;
   }
 
@@ -630,7 +654,7 @@ JsonWriter& JsonWriter::value(const JsonValue& parsedDocument) {
     case JsonValue::Type::String: return value(parsedDocument.asString());
     case JsonValue::Type::Number: {
       double number = parsedDocument.asNumber();
-      bool isWholeNumber = std::trunc(number) == number && std::fabs(number) < kLargestExactlyRepresentableInteger;
+      bool isWholeNumber = std::trunc(number) == number && std::fabs(number) < kSafeInt64CastLimit;
 
       return isWholeNumber ? value(static_cast<int64_t>(number)) : value(number);
     }

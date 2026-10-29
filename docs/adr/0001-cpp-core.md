@@ -12,7 +12,7 @@ The SDK runs inside games. Most are C++; their platform layers differ (NativeAct
 - The only public surface is a flat C API (`core/include/tarkov_companion/tarkov_companion.h`): opaque handle, status codes, UTF-8 JSON in and out, caller-frees strings via `tarkov_companion_free`.
 - Settings are JSON documents whose keys come from `contracts/config-limits.json`; unknown keys are ignored and reported, so an older caller works with a newer core ([ADR 0006](0006-sans-io-session.md)).
 - Android talks to it through a thin JNI layer (`jni_bridge.cpp`) using `RegisterNatives`, byte arrays instead of `jstring`, and status codes instead of thrown Java exceptions.
-- Built with `-fno-exceptions -fno-rtti`, static libc++, symbols hidden.
+- Built with `-fno-exceptions -fno-rtti`, static libc++, symbols hidden. A failed allocation aborts the process, so the core doesn't check for one; on Android the low-memory killer usually ends the process first anyway.
 
 ## Why not ...
 

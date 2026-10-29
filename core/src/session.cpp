@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <charconv>
-#include <new>
 #include <system_error>
 #include <utility>
 
@@ -86,14 +85,7 @@ std::unique_ptr<Session> Session::create(std::string_view configurationJson, std
     return nullptr;
   }
 
-  std::unique_ptr<Session> session(new (std::nothrow) Session(std::move(parsed.settings), std::move(clocks)));
-  if (!session) {
-    if (error) {
-      *error = "out of memory";
-    }
-    return nullptr;
-  }
-
+  std::unique_ptr<Session> session(new Session(std::move(parsed.settings), std::move(clocks)));
   session->logUnknownKeys("config", parsed.unknownKeys);
   if (!session->m_configuration.remoteFlagsUrl.empty()) {
     session->loadRemoteFlags();
@@ -238,13 +230,7 @@ std::optional<BridgeId> Session::openBridge(std::string_view optionsJson, std::s
   logUnknownKeys("bridge options", parsed.unknownKeys);
   BridgeId id = m_nextBridgeId++;
   std::unique_ptr<Bridge> bridge(
-      new (std::nothrow) Bridge(id, std::move(parsed.settings), *this, m_steadyClock, TARKOV_COMPANION_VERSION_STRING));
-  if (!bridge) {
-    if (error) {
-      *error = "out of memory";
-    }
-    return std::nullopt;
-  }
+      new Bridge(id, std::move(parsed.settings), *this, m_steadyClock, TARKOV_COMPANION_VERSION_STRING));
   m_bridgesById.emplace(id, std::move(bridge));
   // The player is back in the overlay, likely online again.
   m_favorites.syncIfChangesAreWaiting();
@@ -451,7 +437,8 @@ void Session::fetchFromGraphqlThenCatalog(const std::string& key, Upstream upstr
   }
 
   std::string body = std::move(upstream.graphqlBody);
-  auto onGraphqlResponse = [this, key, upstream, parseAndStore, done, hasCatalog](const HttpOutcome& response) {
+  auto onGraphqlResponse = [this, key, upstream = std::move(upstream), parseAndStore = std::move(parseAndStore),
+                            done = std::move(done), hasCatalog](const HttpOutcome& response) mutable {
     std::optional<Failure> failure = failureOfHttpResponse(response, key);
     if (!failure) {
       ParseStatus status = parseAndStore(response.body);
@@ -473,7 +460,7 @@ void Session::fetchFromGraphqlThenCatalog(const std::string& key, Upstream upstr
                               std::to_string(kGraphqlRetryAfter.count()) + " minutes");
     }
     m_skipGraphqlUntil = m_steadyClock() + kGraphqlRetryAfter;
-    fetchFromCatalog(key, upstream, parseAndStore, done, failure);
+    fetchFromCatalog(key, std::move(upstream), std::move(parseAndStore), std::move(done), std::move(failure));
   };
 
   sendGraphqlRequest(std::move(body), std::move(onGraphqlResponse));
@@ -482,7 +469,9 @@ void Session::fetchFromGraphqlThenCatalog(const std::string& key, Upstream upstr
 void Session::fetchFromCatalog(const std::string& key, Upstream upstream, ParseAndStoreInEngine parseAndStore,
                                FailureContinuation done, std::optional<Failure> graphqlFailure) {
   HttpRequest request{http::kMethodGet, upstream.catalogFileUrlOrEmpty, {}, std::nullopt};
-  auto onCatalogResponse = [this, key, upstream, parseAndStore, done, graphqlFailure](const HttpOutcome& response) {
+  auto onCatalogResponse = [this, key, upstream = std::move(upstream), parseAndStore = std::move(parseAndStore),
+                            done = std::move(done),
+                            graphqlFailure = std::move(graphqlFailure)](const HttpOutcome& response) {
     std::optional<Failure> failure = failureOfHttpResponse(response, key);
     if (!failure) {
       std::optional<std::string> body = upstream.catalogFileToGraphqlResponse

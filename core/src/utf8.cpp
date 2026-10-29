@@ -12,6 +12,13 @@ constexpr char32_t kFourByteLead = 0xF0;
 constexpr char32_t kContinuationMarker = 0x80;
 constexpr char32_t kContinuationPayloadMask = 0x3F;
 constexpr int kContinuationPayloadBits = 6;
+constexpr char32_t kFirstSurrogate = 0xD800;
+constexpr char32_t kLastSurrogate = 0xDFFF;
+constexpr char32_t kLargestCodePoint = 0x10FFFF;
+
+// Indexed by sequence length. A code point below its length's minimum has a
+// shorter encoding: an overlong form, which RFC 3629 forbids.
+constexpr char32_t kSmallestCodePointOfLength[] = {0, 0, 0x80, 0x800, 0x10000};
 
 size_t sequenceLengthFromLeadByte(char32_t lead) {
   if (lead <= kLargestOneByteCodePoint) {
@@ -50,6 +57,13 @@ char32_t decodeAndAdvance(std::string_view text, size_t* position) {
       return kReplacementCharacter;
     }
     codePoint = (codePoint << kContinuationPayloadBits) | (next & kContinuationPayloadMask);
+  }
+
+  bool isOverlong = codePoint < kSmallestCodePointOfLength[length];
+  bool isSurrogate = codePoint >= kFirstSurrogate && codePoint <= kLastSurrogate;
+  if (isOverlong || isSurrogate || codePoint > kLargestCodePoint) {
+    ++*position;
+    return kReplacementCharacter;
   }
   *position += length;
 

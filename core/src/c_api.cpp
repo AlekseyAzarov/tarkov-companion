@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include <new>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -120,11 +119,7 @@ tarkov_companion_status tarkov_companion_session_create(const char* configuratio
       return TARKOV_COMPANION_ERROR_INVALID_ARGUMENT;
     }
 
-    *out_session = new (std::nothrow) tarkov_companion_session{std::move(implementation)};
-    if (!*out_session) {
-      storeErrorIfWanted(out_error, "out of memory");
-      return TARKOV_COMPANION_ERROR_INTERNAL;
-    }
+    *out_session = new tarkov_companion_session{std::move(implementation)};
 
     return TARKOV_COMPANION_OK;
   });

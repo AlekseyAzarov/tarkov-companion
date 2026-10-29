@@ -9,7 +9,10 @@ Engine::Engine(EngineConfiguration config, SteadyClock clock)
 
 ParseStatus Engine::parseAndStoreItems(std::string_view json, std::string* summariesJsonInResponseOrder,
                                        DataSource source) {
-  // Parse outside the lock: it is the expensive part and touches no shared state.
+  // Parse outside the engine's lock: it touches no shared state. Session calls
+  // this from an HTTP or cache continuation, which runs under Session's own
+  // mutex, so there the whole session waits for the parse. That's acceptable
+  // because the Android layer drives the core from one thread.
   ItemsParseResult parsed = parseItemsResponse(json);
   if (parsed.status != ParseStatus::Ok) {
     return parsed.status;

@@ -68,6 +68,31 @@ TEST(Utf8Test, MalformedInputIsReplacedOneByteAtATime) {
   EXPECT_EQ(pos, text.size());
 }
 
+TEST(Utf8Test, OverlongSurrogateAndOutOfRangeSequencesAreMalformed) {
+  // Overlong "A" (2 bytes), overlong "/" (3 bytes), overlong U+FFFF (4 bytes),
+  // the surrogate U+D800, U+110000, and a lead byte that could only start it.
+  for (std::string sequence : {"\xC1\x81", "\xE0\x80\xAF", "\xF0\x8F\xBF\xBF", "\xED\xA0\x80",
+                               "\xF4\x90\x80\x80", "\xF5\x80\x80\x80"}) {
+    size_t position = 0;
+    EXPECT_EQ(utf8::decodeAndAdvance(sequence, &position), utf8::kReplacementCharacter);
+    EXPECT_EQ(position, 1u);
+  }
+}
+
+TEST(Utf8Test, SmallestAndLargestCodePointOfEachLengthDecode) {
+  struct Case {
+    std::string encoded;
+    char32_t codePoint;
+  };
+  for (const Case& testCase : {Case{"\xC2\x80", 0x80}, Case{"\xDF\xBF", 0x7FF}, Case{"\xE0\xA0\x80", 0x800},
+                               Case{"\xEF\xBF\xBF", 0xFFFF}, Case{"\xF0\x90\x80\x80", 0x10000},
+                               Case{"\xF4\x8F\xBF\xBF", 0x10FFFF}}) {
+    size_t position = 0;
+    EXPECT_EQ(utf8::decodeAndAdvance(testCase.encoded, &position), testCase.codePoint);
+    EXPECT_EQ(position, testCase.encoded.size());
+  }
+}
+
 TEST(ClockTest, EpochMillis) {
   EXPECT_EQ(millisecondsSinceEpoch(SystemTime(std::chrono::milliseconds(1793108040123))), 1793108040123);
   EXPECT_EQ(millisecondsSinceEpoch(SystemTime()), 0);

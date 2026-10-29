@@ -53,6 +53,26 @@ INSTANTIATE_TEST_SUITE_P(Malformed, JsonRejects,
                                            "\"\\ud83d\"", "\"\\ude00\"", "[1] 2", "nan",
                                            "\"tab\there\""));
 
+TEST(JsonParse, LongNumbersStayFinite) {
+  // 400 significant digits after the point once overflowed the mantissa to
+  // inf, and inf * 10^-400 is NaN.
+  auto longFraction = parseJson("0." + std::string(400, '1'));
+  ASSERT_TRUE(longFraction.ok) << longFraction.error;
+  EXPECT_DOUBLE_EQ(longFraction.value.asNumber(), 0.11111111111111111);
+
+  auto longInteger = parseJson("12345678901234567890123");
+  ASSERT_TRUE(longInteger.ok) << longInteger.error;
+  EXPECT_DOUBLE_EQ(longInteger.value.asNumber(), 1.2345678901234567e22);
+
+  auto tinyFraction = parseJson("0." + std::string(400, '0') + "1");
+  ASSERT_TRUE(tinyFraction.ok) << tinyFraction.error;
+  EXPECT_EQ(tinyFraction.value.asNumber(), 0.0);
+
+  auto zeroWithHugeExponent = parseJson("0e400");
+  ASSERT_TRUE(zeroWithHugeExponent.ok) << zeroWithHugeExponent.error;
+  EXPECT_EQ(zeroWithHugeExponent.value.asNumber(), 0.0);
+}
+
 TEST(JsonParse, DepthLimitStopsStackExhaustion) {
   const std::string deeplyNested(10000, '[');
   auto parsed = parseJson(deeplyNested);
