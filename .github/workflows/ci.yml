@@ -115,7 +115,8 @@ jobs:
       - name: Core as an XCFramework (iOS device, iOS simulator, macOS)
         run: |
           echo '### iOS core' >> "$GITHUB_STEP_SUMMARY"
-          bash scripts/build-ios-core.sh | tee -a "$GITHUB_STEP_SUMMARY"
+          bash scripts/build-ios-core.sh | tee -a "$GITHUB_STEP_SUMMARY" | tee "$RUNNER_TEMP/ios-core-sizes.txt"
+          echo "::notice title=iOS core sizes::$(paste -sd ';' "$RUNNER_TEMP/ios-core-sizes.txt")"
       - name: Tests on macOS
         working-directory: sdk-ios
         run: swift test

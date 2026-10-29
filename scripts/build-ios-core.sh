@@ -59,5 +59,14 @@ xcodebuild -create-xcframework \
 echo "Built $OUTPUT"
 for slice in ios-device ios-simulator macos; do
   library="$BUILD/$slice/$LIBRARY"
-  echo "  $slice: $(lipo -archs "$library"), $(( $(stat -f%z "$library") / 1024 )) KB"
+  echo "- $slice: $(lipo -archs "$library"), static library $(($(stat -f%z "$library") / 1024)) KB"
 done
+
+# What the core adds to an app, comparable to the Android .so in docs/footprint.md:
+# linked for arm64 devices with dead stripping, only the C API exported. libc++
+# is the system's here, while Android links its own.
+linked="$BUILD/linked-arm64.dylib"
+xcrun --sdk iphoneos clang++ -dynamiclib -arch arm64 -miphoneos-version-min=$IOS_DEPLOYMENT_TARGET \
+  -Wl,-force_load,"$BUILD/ios-device/$LIBRARY" -Wl,-exported_symbol,'_tarkov_companion_*' \
+  -Wl,-dead_strip -Wl,-x -x c++ /dev/null -o "$linked"
+echo "- linked for arm64 devices: $(($(stat -f%z "$linked") / 1024)) KB"
