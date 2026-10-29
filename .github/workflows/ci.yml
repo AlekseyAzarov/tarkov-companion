@@ -108,6 +108,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Compiler errors and failed tests as annotations
+        run: echo "::add-matcher::.github/matchers/compiler-errors.json"
       - name: Contract constants for Swift
         run: node scripts/generate-swift-contract.mjs
       - name: Core as an XCFramework (iOS device, iOS simulator, macOS)

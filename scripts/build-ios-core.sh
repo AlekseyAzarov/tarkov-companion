@@ -14,13 +14,22 @@ LIBRARY=libtarkov_companion_core.a
 IOS_DEPLOYMENT_TARGET=15.0
 MACOS_DEPLOYMENT_TARGET=12.0
 
+# Quiet unless it fails; then the whole output, compiler errors included.
 build_slice() {
   local name=$1
   shift
+  local log="$BUILD/$name.log"
+  mkdir -p "$BUILD"
   # Static libraries only: CMake's checks would otherwise link (and sign) an iOS executable.
-  cmake -S "$ROOT/core" -B "$BUILD/$name" -DCMAKE_BUILD_TYPE=MinSizeRel \
-    -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY "$@" > /dev/null
-  cmake --build "$BUILD/$name" --parallel > /dev/null
+  if ! {
+    cmake -S "$ROOT/core" -B "$BUILD/$name" -DCMAKE_BUILD_TYPE=MinSizeRel \
+      -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY "$@" &&
+      cmake --build "$BUILD/$name" --parallel
+  } > "$log" 2>&1; then
+    cat "$log"
+    echo "building the core for $name failed" >&2
+    exit 1
+  fi
 }
 
 build_slice ios-device -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos \
