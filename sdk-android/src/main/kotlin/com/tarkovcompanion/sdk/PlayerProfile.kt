@@ -7,11 +7,15 @@ public enum class GameMode(internal val apiValue: String) {
     PVE("pve"),
 }
 
-/** What verdicts depend on: the flea market unlocks at level 15, Intelligence Center level 3 lowers fees. */
+/**
+ * What verdicts depend on: the flea market unlocks at level 15, Intelligence Center level 3 lowers fees,
+ * and quests and hideout levels the player has finished no longer keep an item.
+ */
 public class PlayerProfile private constructor(builder: Builder) {
     public val level: Int = builder.level
     public val fleaUnlocked: Boolean = builder.fleaUnlocked ?: (builder.level >= FLEA_UNLOCK_LEVEL)
-    public val intelligenceCenterLevel: Int = builder.intelligenceCenterLevel
+    public val completedTaskIds: Set<String>? = builder.completedTaskIds
+    public val hideoutLevels: Map<String, Int>? = builder.hideoutLevels
     public val gameMode: GameMode = builder.gameMode
     public val ignoreKeepReasons: Boolean = builder.ignoreKeepReasons
     public val fleaMarginPercent: Int = builder.fleaMarginPercent
@@ -19,7 +23,8 @@ public class PlayerProfile private constructor(builder: Builder) {
     public class Builder {
         internal var level: Int = GeneratedContract.PLAYER_LEVEL_DEFAULT
         internal var fleaUnlocked: Boolean? = null
-        internal var intelligenceCenterLevel: Int = GeneratedContract.INTELLIGENCE_CENTER_LEVEL_DEFAULT
+        internal var completedTaskIds: Set<String>? = null
+        internal var hideoutLevels: Map<String, Int>? = null
         internal var gameMode: GameMode =
             GameMode.entries.first { mode -> mode.apiValue == GeneratedContract.GAME_MODE_DEFAULT }
         internal var ignoreKeepReasons: Boolean = false
@@ -33,9 +38,25 @@ public class PlayerProfile private constructor(builder: Builder) {
         /** Overrides the level-based default (flea unlocks at level 15). */
         public fun fleaUnlocked(unlocked: Boolean): Builder = apply { fleaUnlocked = unlocked }
 
-        public fun intelligenceCenterLevel(level: Int): Builder = apply {
-            require(level in INTELLIGENCE_CENTER_LEVEL_RANGE) { "intelligenceCenterLevel out of range: $level" }
-            intelligenceCenterLevel = level
+        /** tarkov.dev ids of the quests the player has completed. Without them every quest counts as still to do. */
+        public fun completedTaskIds(taskIds: Set<String>): Builder = apply {
+            require(taskIds.size <= COMPLETED_TASK_IDS_MAXIMUM_COUNT) {
+                "more than $COMPLETED_TASK_IDS_MAXIMUM_COUNT task ids"
+            }
+            require(taskIds.none(String::isEmpty)) { "empty task id" }
+            completedTaskIds = taskIds.toSet()
+        }
+
+        /**
+         * Built level of each hideout station by tarkov.dev normalizedName, e.g. "bitcoin-farm" to 2. A station
+         * left out is not built. Without this every hideout level counts as still to build. "intelligence-center"
+         * sets the flea fee discount.
+         */
+        public fun hideoutLevels(levels: Map<String, Int>): Builder = apply {
+            for ((station, level) in levels) {
+                require(level in HIDEOUT_LEVEL_RANGE) { "hideout level of $station out of range: $level" }
+            }
+            hideoutLevels = levels.toMap()
         }
 
         public fun gameMode(mode: GameMode): Builder = apply { gameMode = mode }
@@ -58,8 +79,9 @@ public class PlayerProfile private constructor(builder: Builder) {
 
         private const val DEFAULT_FLEA_MARGIN_PERCENT = GeneratedContract.FLEA_MARGIN_PERCENT_DEFAULT
         private val PLAYER_LEVEL_RANGE = GeneratedContract.PLAYER_LEVEL_MINIMUM..GeneratedContract.PLAYER_LEVEL_MAXIMUM
-        private val INTELLIGENCE_CENTER_LEVEL_RANGE =
-            GeneratedContract.INTELLIGENCE_CENTER_LEVEL_MINIMUM..GeneratedContract.INTELLIGENCE_CENTER_LEVEL_MAXIMUM
+        private const val COMPLETED_TASK_IDS_MAXIMUM_COUNT = GeneratedContract.COMPLETED_TASK_IDS_MAXIMUM_COUNT
+        private val HIDEOUT_LEVEL_RANGE =
+            GeneratedContract.HIDEOUT_LEVELS_MINIMUM..GeneratedContract.HIDEOUT_LEVELS_MAXIMUM
         private val FLEA_MARGIN_PERCENT_RANGE =
             GeneratedContract.FLEA_MARGIN_PERCENT_MINIMUM..GeneratedContract.FLEA_MARGIN_PERCENT_MAXIMUM
 

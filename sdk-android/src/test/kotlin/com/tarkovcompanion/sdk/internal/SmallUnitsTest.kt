@@ -122,7 +122,8 @@ class ConfigTest {
             { CompanionConfig.Builder().graphqlEndpoint("http://insecure") },
             { CompanionConfig.Builder().language("english") },
             { CompanionConfig.Builder().itemCacheCapacity(1) },
-            { PlayerProfile.Builder().intelligenceCenterLevel(4) },
+            { PlayerProfile.Builder().hideoutLevels(mapOf("library" to 11)) },
+            { PlayerProfile.Builder().completedTaskIds(setOf("")) },
             { PlayerProfile.Builder().level(0) },
         )
     }

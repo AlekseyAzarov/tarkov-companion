@@ -49,14 +49,17 @@ Initialize in `Application`, not lazily in an activity: Android can restore the 
 ```kotlin
 TarkovCompanion.setPlayerProfile(
     PlayerProfile.Builder()
-        .level(player.level)               // flea market unlocks at 15
-        .intelligenceCenterLevel(hideout.intel)   // level 3 cuts flea fees by 30%
+        .level(player.level)                        // flea market unlocks at 15
+        .completedTaskIds(player.completedQuestIds) // tarkov.dev task ids
+        .hideoutLevels(hideout.builtLevels)         // "bitcoin-farm" to 2; "intelligence-center" 3 cuts flea fees by 30%
         .gameMode(GameMode.PVE)
         .build()
 )
 ```
 
 Call it whenever these change; the next verdict uses the new values.
+
+The player's progress decides "keep": a completed quest, or a hideout level already built, no longer keeps an item. Stations are keyed by tarkov.dev's `normalizedName`, and a station left out of `hideoutLevels` counts as not built. Leave either call out when the game doesn't know: then every quest and hideout level that takes the item counts as still to do.
 
 ## 4. Open it
 

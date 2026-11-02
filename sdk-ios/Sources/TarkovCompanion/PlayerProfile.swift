@@ -3,11 +3,20 @@ public enum GameMode: String, Sendable {
     case pve
 }
 
-/// What verdicts depend on: the flea market unlocks at level 15, Intelligence Center level 3 lowers fees.
+/// What verdicts depend on: the flea market unlocks at level 15, Intelligence Center level 3 lowers fees,
+/// and quests and hideout levels the player has finished no longer keep an item.
 public struct PlayerProfile: Equatable, Sendable {
     public let level: Int
     public let fleaUnlocked: Bool
-    public let intelligenceCenterLevel: Int
+
+    /// tarkov.dev ids of the quests the player has completed; `nil` counts every quest as still to do.
+    public let completedTaskIds: Set<String>?
+
+    /// Built level of each hideout station by tarkov.dev normalizedName, e.g. `["bitcoin-farm": 2]`. A station
+    /// left out is not built; `nil` counts every hideout level as still to build. "intelligence-center" sets the
+    /// flea fee discount.
+    public let hideoutLevels: [String: Int]?
+
     public let gameMode: GameMode
 
     /// Recommend selling even items needed for quests or the hideout.
@@ -19,13 +28,13 @@ public struct PlayerProfile: Equatable, Sendable {
     // From contracts/config-limits.json.
     public static let fleaUnlockLevel = GeneratedContract.fleaUnlockLevel
     public static let defaultLevel = GeneratedContract.playerLevelDefault
-    public static let defaultIntelligenceCenterLevel = GeneratedContract.intelligenceCenterLevelDefault
     public static let defaultFleaMarginPercent = GeneratedContract.fleaMarginPercentDefault
 
     public static let `default` = PlayerProfile(
         validatedLevel: defaultLevel,
         fleaUnlocked: defaultLevel >= fleaUnlockLevel,
-        intelligenceCenterLevel: defaultIntelligenceCenterLevel,
+        completedTaskIds: nil,
+        hideoutLevels: nil,
         gameMode: GameMode(rawValue: GeneratedContract.gameModeDefault) ?? .regular,
         ignoreKeepReasons: false,
         fleaMarginPercent: defaultFleaMarginPercent
@@ -36,7 +45,8 @@ public struct PlayerProfile: Equatable, Sendable {
     public init(
         level: Int = PlayerProfile.defaultLevel,
         fleaUnlocked: Bool? = nil,
-        intelligenceCenterLevel: Int = PlayerProfile.defaultIntelligenceCenterLevel,
+        completedTaskIds: Set<String>? = nil,
+        hideoutLevels: [String: Int]? = nil,
         gameMode: GameMode = .regular,
         ignoreKeepReasons: Bool = false,
         fleaMarginPercent: Int = PlayerProfile.defaultFleaMarginPercent
@@ -46,11 +56,24 @@ public struct PlayerProfile: Equatable, Sendable {
             GeneratedContract.playerLevelMinimum...GeneratedContract.playerLevelMaximum,
             "level"
         )
-        try Self.requireInRange(
-            intelligenceCenterLevel,
-            GeneratedContract.intelligenceCenterLevelMinimum...GeneratedContract.intelligenceCenterLevelMaximum,
-            "intelligenceCenterLevel"
-        )
+        if let completedTaskIds {
+            if completedTaskIds.count > GeneratedContract.completedTaskIdsMaximumCount {
+                throw CompanionError(
+                    .invalidArgument,
+                    "more than \(GeneratedContract.completedTaskIdsMaximumCount) task ids"
+                )
+            }
+            if completedTaskIds.contains("") {
+                throw CompanionError(.invalidArgument, "empty task id")
+            }
+        }
+        for (station, stationLevel) in hideoutLevels ?? [:] {
+            try Self.requireInRange(
+                stationLevel,
+                GeneratedContract.hideoutLevelsMinimum...GeneratedContract.hideoutLevelsMaximum,
+                "hideout level of \(station)"
+            )
+        }
         try Self.requireInRange(
             fleaMarginPercent,
             GeneratedContract.fleaMarginPercentMinimum...GeneratedContract.fleaMarginPercentMaximum,
@@ -60,7 +83,8 @@ public struct PlayerProfile: Equatable, Sendable {
         self.init(
             validatedLevel: level,
             fleaUnlocked: fleaUnlocked ?? (level >= Self.fleaUnlockLevel),
-            intelligenceCenterLevel: intelligenceCenterLevel,
+            completedTaskIds: completedTaskIds,
+            hideoutLevels: hideoutLevels,
             gameMode: gameMode,
             ignoreKeepReasons: ignoreKeepReasons,
             fleaMarginPercent: fleaMarginPercent
@@ -70,14 +94,16 @@ public struct PlayerProfile: Equatable, Sendable {
     private init(
         validatedLevel: Int,
         fleaUnlocked: Bool,
-        intelligenceCenterLevel: Int,
+        completedTaskIds: Set<String>?,
+        hideoutLevels: [String: Int]?,
         gameMode: GameMode,
         ignoreKeepReasons: Bool,
         fleaMarginPercent: Int
     ) {
         self.level = validatedLevel
         self.fleaUnlocked = fleaUnlocked
-        self.intelligenceCenterLevel = intelligenceCenterLevel
+        self.completedTaskIds = completedTaskIds
+        self.hideoutLevels = hideoutLevels
         self.gameMode = gameMode
         self.ignoreKeepReasons = ignoreKeepReasons
         self.fleaMarginPercent = fleaMarginPercent

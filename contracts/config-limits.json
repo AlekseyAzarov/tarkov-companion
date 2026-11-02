@@ -17,7 +17,8 @@
   "profile": {
     "playerLevel": { "minimum": 1, "maximum": 100, "default": 15 },
     "fleaUnlocked": {},
-    "intelligenceCenterLevel": { "minimum": 0, "maximum": 3, "default": 0 },
+    "completedTaskIds": { "maximumCount": 2000 },
+    "hideoutLevels": { "minimum": 0, "maximum": 10 },
     "gameMode": { "default": "regular" },
     "ignoreKeepReasons": {},
     "fleaMarginPercent": { "minimum": 0, "maximum": 100, "default": 5 }

@@ -241,6 +241,7 @@ export function buildGameModeFiles(gameMode, datasets, { updated, minimumItemCou
 
     const hideoutStations = Object.values(stations).map((station) => ({
       name: translateHideout(station.name),
+      normalizedName: station.normalizedName,
       levels: (station.levels ?? []).map((level) => ({
         level: level.level,
         itemRequirements: (level.itemRequirements ?? []).map((requirement) => ({

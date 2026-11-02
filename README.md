@@ -23,7 +23,7 @@ The verdict accounts for:
 
 - best trader offer vs. flea market **after the listing fee** (Intelligence Center discount included)
 - whether the flea is unlocked for this player (level 15) and whether the item is flea-banned
-- quests and hideout upgrades that still need the item → **keep**
+- quests and hideout upgrades that still need the item → **keep**: the game passes the quests the player has completed and the hideout levels built; without them every quest and level that takes the item counts
 - price per inventory slot, and how stale the prices are
 
 ## Architecture
@@ -80,7 +80,13 @@ Everything that knows about tarkov.dev, the web UI's protocol, the remote flags,
 ```kotlin
 // Application.onCreate
 TarkovCompanion.initialize(this, CompanionConfig.Builder().httpTransport(myTransport).build())
-TarkovCompanion.setPlayerProfile(PlayerProfile.Builder().level(22).intelligenceCenterLevel(1).build())
+TarkovCompanion.setPlayerProfile(
+    PlayerProfile.Builder()
+        .level(22)
+        .completedTaskIds(player.completedQuestIds)
+        .hideoutLevels(mapOf("intelligence-center" to 1, "bitcoin-farm" to 2))
+        .build()
+)
 
 // pause menu button
 TarkovCompanion.showItemLookup(activity)
@@ -111,9 +117,9 @@ The complete sample integration is [one file](host-game/src/withSdk/kotlin/com/t
 
 | Suite | Where it runs | Count |
 |---|---|---:|
-| C++ core (GoogleTest): parser, recommender, engine, session flows against a scripted platform, bridge protocol and state machine, protocol transcript, remote flags, analytics catalog, sign-in (PKCE, refresh, rotation, rate limits, sign-out races, forged redirects, token leaks), SHA-256, favourites (merge, conflicts between devices, offline queue), catalog fallback and search rules, settings, C API | host with ASan/UBSan in CI; on Android via [`run-core-tests-on-device.sh`](scripts/run-core-tests-on-device.sh) | 211 |
+| C++ core (GoogleTest): parser, recommender, engine, session flows against a scripted platform, bridge protocol and state machine, protocol transcript, remote flags, analytics catalog, sign-in (PKCE, refresh, rotation, rate limits, sign-out races, forged redirects, token leaks), SHA-256, favourites (merge, conflicts between devices, offline queue), catalog fallback and search rules, settings, C API | host with ASan/UBSan in CI; on Android via [`run-core-tests-on-device.sh`](scripts/run-core-tests-on-device.sh) | 215 |
 | Kotlin unit (JVM): session executor (action order on a thread pool, a slow request, failing stores, unreadable actions), bridge connections, sign-in plumbing, favourites plumbing, catalog setting, kill switch verdict, settings documents, action format, analytics catalog check, disk store, redirect scheme | JVM | 51 |
-| Instrumented: real `.so`, JNI, golden contract through the session, bridge round trip, remote flags, sign-in, favourites across a restart, Keystore secret store, public API end to end | emulator | 16 |
+| Instrumented: real `.so`, JNI, golden contract through the session, player progress in the verdict, bridge round trip, remote flags, sign-in, favourites across a restart, Keystore secret store, public API end to end | emulator | 17 |
 | Web (vitest): bridge, protocol validators, protocol transcript, formatting | Node | 52 |
 | Development server (`node --test`): PKCE, the real form, rotation and reuse detection, revocation, favourites sync (conflicts, limit, clocks ahead), catalog serving | Node | 22 |
 | Catalog generator (`node --test`): search rules shared with the core, data mapping, response shapes against the GraphQL fixtures | Node | 11 |
@@ -159,6 +165,7 @@ Debug builds of the sample game fall back to the recorded fixtures when tarkov.d
 Not planned: beyond the scope of this project.
 
 - iOS beyond the headless API: the overlay in a `WKWebView` (which has no `MessagePort` to hand to the page, so the bridge needs another transport), sign-in with `ASWebAuthenticationSession` and the Keychain, favourites.
+- Found in raid: a quest that only takes found-in-raid items still keeps a bought one. The game would have to pass the item's status with the lookup. Quest reasons also always say one item: tarkov.dev's `usedInTasks` doesn't say how many.
 
 ## How AI tools were used
 

@@ -6,6 +6,7 @@
 #include "flea_fee.h"
 #include "item_name_and_icon_json.h"
 #include "json.h"
+#include "tarkov_dev_schema.h"
 
 namespace tarkov_companion {
 
@@ -27,6 +28,19 @@ namespace {
 // Undercut the current lowest flea offer by this much so the listing sells.
 constexpr int64_t kFleaUndercutRubles = 1;
 constexpr int64_t kMinimumListPriceRubles = 1;
+
+bool hasCompletedTask(const PlayerContext& context, const std::string& taskId) {
+  return context.completedTaskIds && context.completedTaskIds->count(taskId) > 0;
+}
+
+int builtHideoutLevel(const PlayerContext& context, const std::string& stationNormalizedName) {
+  if (!context.hideoutLevels) {
+    return 0;
+  }
+  auto station = context.hideoutLevels->find(stationNormalizedName);
+
+  return station == context.hideoutLevels->end() ? 0 : station->second;
+}
 
 std::optional<TraderOption> bestTraderOffer(const Item& item) {
   std::optional<TraderOption> best;
@@ -75,7 +89,8 @@ FleaOption fleaOption(const Item& item, const PlayerContext& context) {
   }
 
   flea.listPrice = *listPrice;
-  flea.fee = fleaListingFee(item.basePrice, flea.listPrice, context.intelligenceCenterLevel);
+  int intelligenceCenterLevel = builtHideoutLevel(context, tarkov_dev::kStationIntelligenceCenter);
+  flea.fee = fleaListingFee(item.basePrice, flea.listPrice, intelligenceCenterLevel);
   flea.net = flea.listPrice - flea.fee;
 
   if (!context.fleaUnlocked) {
@@ -87,9 +102,13 @@ FleaOption fleaOption(const Item& item, const PlayerContext& context) {
   return flea;
 }
 
-std::vector<KeepReason> keepReasons(const Item& item, const HideoutRequirementsByItemId* hideout) {
+std::vector<KeepReason> keepReasons(const Item& item, const HideoutRequirementsByItemId* hideout,
+                                    const PlayerContext& context) {
   std::vector<KeepReason> reasons;
   for (const auto& task : item.usedInTasks) {
+    if (hasCompletedTask(context, task.id)) {
+      continue;
+    }
     reasons.push_back({task.name, KeepReason::Kind::Task, 1});
   }
 
@@ -97,6 +116,9 @@ std::vector<KeepReason> keepReasons(const Item& item, const HideoutRequirementsB
     auto requirements = hideout->find(item.id);
     if (requirements != hideout->end()) {
       for (const auto& requirement : requirements->second) {
+        if (builtHideoutLevel(context, requirement.stationNormalizedName) >= requirement.level) {
+          continue;
+        }
         std::string stationAndLevel = requirement.stationName + " L" + std::to_string(requirement.level);
         reasons.push_back({stationAndLevel, KeepReason::Kind::Hideout, requirement.count});
       }
@@ -114,7 +136,7 @@ Recommendation recommend(const Item& item, const HideoutRequirementsByItemId* hi
   result.itemName = item.nameAndIcon.name;
   result.bestTrader = bestTraderOffer(item);
   result.flea = fleaOption(item, context);
-  result.keepReasons = keepReasons(item, hideout);
+  result.keepReasons = keepReasons(item, hideout, context);
 
   const int64_t traderPrice = result.bestTrader ? result.bestTrader->price : 0;
   const bool fleaUsable = result.flea->available && result.flea->net > 0;

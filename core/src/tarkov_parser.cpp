@@ -134,6 +134,7 @@ HideoutParseResult parseHideoutResponse(std::string_view json) {
 
   for (const auto& station : stations.items()) {
     std::string stationName(station[tarkov_dev::kFieldName].asString());
+    std::string stationNormalizedName(station[tarkov_dev::kFieldNormalizedName].asString());
     for (const auto& level : station[tarkov_dev::kFieldLevels].items()) {
       int levelNumber = static_cast<int>(level[tarkov_dev::kFieldLevel].asInteger());
       for (const auto& requirement : level[tarkov_dev::kFieldItemRequirements].items()) {
@@ -142,7 +143,8 @@ HideoutParseResult parseHideoutResponse(std::string_view json) {
         if (itemId.empty() || count <= 0) {
           continue;
         }
-        result.requirementsByItemId[std::string(itemId)].push_back({stationName, levelNumber, count});
+        result.requirementsByItemId[std::string(itemId)].push_back(
+            {stationName, stationNormalizedName, levelNumber, count});
       }
     }
   }

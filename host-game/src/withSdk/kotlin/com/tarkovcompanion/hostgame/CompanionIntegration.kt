@@ -39,7 +39,8 @@ object CompanionIntegration {
             }
         }
 
-        TarkovCompanion.setPlayerProfile(PlayerProfile.Builder().level(22).intelligenceCenterLevel(1).build())
+        val profile = PlayerProfile.Builder().level(22).hideoutLevels(mapOf("intelligence-center" to 1)).build()
+        TarkovCompanion.setPlayerProfile(profile)
     }
 
     // Loads the overlay's WebView engine ahead of the first tap on the companion button.

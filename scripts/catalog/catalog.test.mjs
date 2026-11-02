@@ -90,7 +90,13 @@ function tinyGameModeDatasets() {
     },
     traders: { data: { t1: { id: 't1', name: 't1 Nickname', normalizedName: 'therapist' } } },
     hideout: {
-      data: { s1: { name: 'area_1_name', levels: [{ level: 2, itemRequirements: [{ item: 'gpu', count: 1 }] }] } },
+      data: {
+        s1: {
+          name: 'area_1_name',
+          normalizedName: 'bitcoin-farm',
+          levels: [{ level: 2, itemRequirements: [{ item: 'gpu', count: 1 }] }],
+        },
+      },
     },
     items_en: {
       data: {
@@ -169,7 +175,11 @@ describe('buildGameModeFiles', () => {
     const recordedStation = fixture('hideout.json').data.hideoutStations[0];
 
     assert.deepEqual(hideoutStations, [
-      { name: 'Bitcoin farm', levels: [{ level: 2, itemRequirements: [{ count: 1, item: { id: 'gpu' } }] }] },
+      {
+        name: 'Bitcoin farm',
+        normalizedName: 'bitcoin-farm',
+        levels: [{ level: 2, itemRequirements: [{ count: 1, item: { id: 'gpu' } }] }],
+      },
     ]);
     assert.deepEqual(sortedKeys(hideoutStations[0]), sortedKeys(recordedStation));
   });

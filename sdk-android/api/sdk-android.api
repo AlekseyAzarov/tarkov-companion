@@ -104,22 +104,24 @@ public final class com/tarkovcompanion/sdk/PlayerProfile {
 	public static final field Companion Lcom/tarkovcompanion/sdk/PlayerProfile$Companion;
 	public static final field DEFAULT Lcom/tarkovcompanion/sdk/PlayerProfile;
 	public static final field FLEA_UNLOCK_LEVEL I
+	public final fun getCompletedTaskIds ()Ljava/util/Set;
 	public final fun getFleaMarginPercent ()I
 	public final fun getFleaUnlocked ()Z
 	public final fun getGameMode ()Lcom/tarkovcompanion/sdk/GameMode;
+	public final fun getHideoutLevels ()Ljava/util/Map;
 	public final fun getIgnoreKeepReasons ()Z
-	public final fun getIntelligenceCenterLevel ()I
 	public final fun getLevel ()I
 }
 
 public final class com/tarkovcompanion/sdk/PlayerProfile$Builder {
 	public fun <init> ()V
 	public final fun build ()Lcom/tarkovcompanion/sdk/PlayerProfile;
+	public final fun completedTaskIds (Ljava/util/Set;)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 	public final fun fleaMarginPercent (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 	public final fun fleaUnlocked (Z)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 	public final fun gameMode (Lcom/tarkovcompanion/sdk/GameMode;)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
+	public final fun hideoutLevels (Ljava/util/Map;)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 	public final fun ignoreKeepReasons (Z)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
-	public final fun intelligenceCenterLevel (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 	public final fun level (I)Lcom/tarkovcompanion/sdk/PlayerProfile$Builder;
 }
 

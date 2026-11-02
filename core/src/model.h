@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "contract_generated.h"
@@ -47,6 +48,7 @@ struct Item {
 
 struct HideoutRequirement {
   std::string stationName;
+  std::string stationNormalizedName;
   int level = 0;
   int count = 0;
 };
@@ -60,9 +62,10 @@ inline constexpr double kDefaultFleaMargin = static_cast<double>(contract::kFlea
 struct PlayerContext {
   int playerLevel = static_cast<int>(contract::kPlayerLevelDefault);
   bool fleaUnlocked = true;
-  int intelligenceCenterLevel = 0;
   bool ignoreKeepReasons = false;
   double fleaMargin = kDefaultFleaMargin;
+  std::optional<std::unordered_set<std::string>> completedTaskIds;
+  std::optional<std::unordered_map<std::string, int>> hideoutLevels;
 };
 
 enum class Verdict { Keep, SellFlea, SellTrader, NoBuyer };

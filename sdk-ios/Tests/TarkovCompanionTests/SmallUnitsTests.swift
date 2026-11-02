@@ -54,7 +54,8 @@ final class PlayerProfileTests: XCTestCase {
     func testValuesOutOfRangeAreRejected() {
         for makeProfile in [
             { try PlayerProfile(level: 0) },
-            { try PlayerProfile(intelligenceCenterLevel: 4) },
+            { try PlayerProfile(hideoutLevels: ["library": 11]) },
+            { try PlayerProfile(completedTaskIds: [""]) },
             { try PlayerProfile(fleaMarginPercent: 101) },
         ] {
             XCTAssertThrowsError(try makeProfile()) { error in
@@ -69,5 +70,21 @@ final class PlayerProfileTests: XCTestCase {
         XCTAssertEqual(try json.integer(GeneratedContract.keyPlayerLevel), 22)
         XCTAssertEqual(try json.string(GeneratedContract.keyGameMode), "pve")
         XCTAssertEqual(try json.boolean(GeneratedContract.keyFleaUnlocked), true)
+    }
+
+    func testProfileJsonCarriesProgressOnlyWhenGiven() throws {
+        let withProgress = try PlayerProfile(completedTaskIds: ["task-1"], hideoutLevels: ["bitcoin-farm": 2])
+        let json = try profileFields(withProgress)
+        XCTAssertEqual(json[GeneratedContract.keyCompletedTaskIds] as? [String], ["task-1"])
+        XCTAssertEqual(json[GeneratedContract.keyHideoutLevels] as? [String: Int], ["bitcoin-farm": 2])
+
+        let withoutProgress = try profileFields(PlayerProfile.default)
+        XCTAssertTrue(withoutProgress[GeneratedContract.keyHideoutLevels] is NSNull)
+    }
+
+    private func profileFields(_ profile: PlayerProfile) throws -> [String: Any] {
+        let data = Data(CoreSettings.profileJson(profile).utf8)
+
+        return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
     }
 }

@@ -1,6 +1,7 @@
 query Hideout($lang: LanguageCode, $gameMode: GameMode) {
   hideoutStations(lang: $lang, gameMode: $gameMode) {
     name
+    normalizedName
     levels {
       level
       itemRequirements {

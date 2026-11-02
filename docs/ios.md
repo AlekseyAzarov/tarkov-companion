@@ -39,7 +39,9 @@ first lookup. Call it once; later calls are ignored.
 ## 3. Tell it about the player
 
 ```swift
-try TarkovCompanion.setPlayerProfile(PlayerProfile(level: 22, intelligenceCenterLevel: 1))
+try TarkovCompanion.setPlayerProfile(
+    PlayerProfile(level: 22, completedTaskIds: completedQuestIds, hideoutLevels: ["intelligence-center": 1])
+)
 ```
 
 `PlayerProfile` throws `CompanionError` with `.invalidArgument` for a value

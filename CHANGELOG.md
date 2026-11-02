@@ -7,6 +7,10 @@ All notable changes to the SDK. Format: [Keep a Changelog](https://keepachangelo
 ### Added
 - iOS: a Swift package (`sdk-ios`) with the headless API, search and verdicts with the offline cache and the catalog fallback, on the same core built as an XCFramework ([iOS guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)).
 
+### Changed
+- Keep verdicts follow the player's progress: `PlayerProfile` takes `completedTaskIds` and `hideoutLevels` (built level by tarkov.dev station `normalizedName`), and a completed quest or a level already built no longer keeps an item. Without them, verdicts are as before.
+- `intelligenceCenterLevel` is gone from `PlayerProfile` and the profile JSON: the flea fee discount comes from `hideoutLevels["intelligence-center"]`.
+
 ### Fixed
 - JSON numbers with up to 15 significant digits are read correctly rounded: `0.3` was 0.30000000000000004.
 

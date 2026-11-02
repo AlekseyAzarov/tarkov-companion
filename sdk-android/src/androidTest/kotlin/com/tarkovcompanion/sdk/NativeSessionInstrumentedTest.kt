@@ -133,6 +133,23 @@ class NativeSessionInstrumentedTest {
     }
 
     @Test
+    fun builtHideoutLevelNoLongerKeepsTheItem() {
+        val session = openSession()
+        session.search(1, "hose")
+        answerHttpFromFixturesAndCacheFromNothingUntilResult(session, 1)
+        val hoseItemId = "59e35cbb86f7741778269d83"
+
+        val waterCollectorBuilt = PlayerProfile.Builder().level(5).hideoutLevels(mapOf("water-collector" to 1)).build()
+        session.setProfile(CoreSettings.profileJson(waterCollectorBuilt))
+        session.recommend(2, hoseItemId)
+        val payload = answerHttpFromFixturesAndCacheFromNothingUntilResult(session, 2).payload!!.decodeToString()
+
+        val recommendation = JSONObject(payload).getJSONObject("recommendation")
+        assertEquals("sell_trader", recommendation.getString("verdict"))
+        assertEquals(0, recommendation.getJSONArray("keepReasons").length())
+    }
+
+    @Test
     fun bridgeAnswersTheHandshakeAndASearch() {
         val session = openSession()
         val bridgeId = session.openBridgeAndGetId("""{"initialState":{"route":"search"}}""")

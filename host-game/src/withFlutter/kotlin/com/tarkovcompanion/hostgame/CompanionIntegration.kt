@@ -28,7 +28,8 @@ object CompanionIntegration {
             .catalogUrl("https://alekseyazarov.github.io/tarkov-companion/catalog")
             .build()
         TarkovCompanion.initialize(application, config)
-        TarkovCompanion.setPlayerProfile(PlayerProfile.Builder().level(22).intelligenceCenterLevel(1).build())
+        val profile = PlayerProfile.Builder().level(22).hideoutLevels(mapOf("intelligence-center" to 1)).build()
+        TarkovCompanion.setPlayerProfile(profile)
     }
 
     // Starts the Flutter engine and the Dart screen; TarkovCompanion.prewarm() would load the WebView, which this build never shows.

@@ -3,6 +3,7 @@ package com.tarkovcompanion.sdk.internal.session
 import com.tarkovcompanion.sdk.CompanionConfig
 import com.tarkovcompanion.sdk.PlayerProfile
 import com.tarkovcompanion.sdk.internal.generated.GeneratedContract
+import org.json.JSONArray
 import org.json.JSONObject
 
 /** Builds the session's settings documents; key names are generated from contracts/config-limits.json. */
@@ -51,14 +52,21 @@ internal object CoreSettings {
 
     private val USABLE_REDIRECT_SCHEME = Regex("[a-z][a-z0-9+.-]*")
 
-    fun profileJson(profile: PlayerProfile): String = JSONObject()
-        .put(GeneratedContract.KEY_PLAYER_LEVEL, profile.level)
-        .put(GeneratedContract.KEY_FLEA_UNLOCKED, profile.fleaUnlocked)
-        .put(GeneratedContract.KEY_INTELLIGENCE_CENTER_LEVEL, profile.intelligenceCenterLevel)
-        .put(GeneratedContract.KEY_GAME_MODE, profile.gameMode.apiValue)
-        .put(GeneratedContract.KEY_IGNORE_KEEP_REASONS, profile.ignoreKeepReasons)
-        .put(GeneratedContract.KEY_FLEA_MARGIN_PERCENT, profile.fleaMarginPercent)
-        .toString()
+    // Progress the host didn't pass is sent as null, which the core reads as absent.
+    fun profileJson(profile: PlayerProfile): String {
+        val completedTaskIds = profile.completedTaskIds?.let { taskIds -> JSONArray(taskIds) } ?: JSONObject.NULL
+        val hideoutLevels = profile.hideoutLevels?.let { levels -> JSONObject(levels) } ?: JSONObject.NULL
+
+        return JSONObject()
+            .put(GeneratedContract.KEY_PLAYER_LEVEL, profile.level)
+            .put(GeneratedContract.KEY_FLEA_UNLOCKED, profile.fleaUnlocked)
+            .put(GeneratedContract.KEY_COMPLETED_TASK_IDS, completedTaskIds)
+            .put(GeneratedContract.KEY_HIDEOUT_LEVELS, hideoutLevels)
+            .put(GeneratedContract.KEY_GAME_MODE, profile.gameMode.apiValue)
+            .put(GeneratedContract.KEY_IGNORE_KEEP_REASONS, profile.ignoreKeepReasons)
+            .put(GeneratedContract.KEY_FLEA_MARGIN_PERCENT, profile.fleaMarginPercent)
+            .toString()
+    }
 
     fun bridgeOptionsJson(stateRestoredAfterProcessDeath: UiState, millisecondsSinceScreenOpened: Long): String {
         val state = JSONObject().put(GeneratedContract.BRIDGE_FIELD_ROUTE, stateRestoredAfterProcessDeath.route)

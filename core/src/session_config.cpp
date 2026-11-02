@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 #include "contract_generated.h"
 #include "json.h"
@@ -30,6 +34,23 @@ std::vector<std::string> findUnknownKeys(const JsonValue& root, const char* cons
   return unknownKeys;
 }
 
+bool readInteger(const JsonValue& value, std::string_view name, int64_t minimum, int64_t maximum, int64_t* output,
+                 std::string* error) {
+  double number = value.asNumber();
+  // Fractions are rejected rather than rounded: 2.5 is a caller bug, not a 3.
+  bool outOfRange = number < static_cast<double>(minimum) || number > static_cast<double>(maximum);
+  if (!value.isNumber() || std::trunc(number) != number || outOfRange) {
+    std::string allowed = maximum == kNoUpperLimit ? ">= " + std::to_string(minimum)
+                                                   : "in " + std::to_string(minimum) + ".." + std::to_string(maximum);
+    *error = std::string(name) + " must be an integer " + allowed;
+    return false;
+  }
+
+  *output = static_cast<int64_t>(number);
+
+  return true;
+}
+
 bool readIntegerIfPresent(const JsonValue& root, const char* key, int64_t minimum, int64_t maximum, int64_t* output,
                           std::string* error) {
   const JsonValue& value = root[key];
@@ -37,17 +58,56 @@ bool readIntegerIfPresent(const JsonValue& root, const char* key, int64_t minimu
     return true;
   }
 
-  double number = value.asNumber();
-  // Fractions are rejected rather than rounded: 2.5 is a caller bug, not a 3.
-  bool outOfRange = number < static_cast<double>(minimum) || number > static_cast<double>(maximum);
-  if (!value.isNumber() || std::trunc(number) != number || outOfRange) {
-    std::string allowed = maximum == kNoUpperLimit ? ">= " + std::to_string(minimum)
-                                                   : "in " + std::to_string(minimum) + ".." + std::to_string(maximum);
-    *error = std::string(key) + " must be an integer " + allowed;
+  return readInteger(value, key, minimum, maximum, output, error);
+}
+
+bool readCompletedTaskIdsIfPresent(const JsonValue& root, PlayerContext* context, std::string* error) {
+  const JsonValue& value = root[contract::kKeyCompletedTaskIds];
+  if (value.isNull()) {
+    return true;
+  }
+
+  bool valid = value.isArray() && value.items().size() <= static_cast<size_t>(contract::kCompletedTaskIdsMaximumCount);
+  std::unordered_set<std::string> taskIds;
+  for (const auto& taskId : value.items()) {
+    if (!taskId.isString() || taskId.asString().empty()) {
+      valid = false;
+      break;
+    }
+    taskIds.emplace(taskId.asString());
+  }
+  if (!valid) {
+    *error = std::string(contract::kKeyCompletedTaskIds) + " must be an array of at most " +
+             std::to_string(contract::kCompletedTaskIdsMaximumCount) + " task ids";
     return false;
   }
 
-  *output = static_cast<int64_t>(number);
+  context->completedTaskIds = std::move(taskIds);
+
+  return true;
+}
+
+bool readHideoutLevelsIfPresent(const JsonValue& root, PlayerContext* context, std::string* error) {
+  const JsonValue& value = root[contract::kKeyHideoutLevels];
+  if (value.isNull()) {
+    return true;
+  }
+  if (!value.isObject()) {
+    *error = std::string(contract::kKeyHideoutLevels) + " must be an object of station levels";
+    return false;
+  }
+
+  std::unordered_map<std::string, int> levels;
+  for (const auto& [station, levelJson] : value.members()) {
+    std::string name = std::string(contract::kKeyHideoutLevels) + "." + station;
+    int64_t level = 0;
+    if (!readInteger(levelJson, name, contract::kHideoutLevelsMinimum, contract::kHideoutLevelsMaximum, &level, error)) {
+      return false;
+    }
+    levels[station] = static_cast<int>(level);
+  }
+
+  context->hideoutLevels = std::move(levels);
 
   return true;
 }
@@ -288,12 +348,9 @@ SettingsParseResult<PlayerProfile> parsePlayerProfile(std::string_view json) {
     return result;
   }
 
-  int64_t intelligenceCenterLevel = contract::kIntelligenceCenterLevelDefault;
-  if (!readIntegerIfPresent(root, contract::kKeyIntelligenceCenterLevel, contract::kIntelligenceCenterLevelMinimum,
-                            contract::kIntelligenceCenterLevelMaximum, &intelligenceCenterLevel, error)) {
+  if (!readCompletedTaskIdsIfPresent(root, &context, error) || !readHideoutLevelsIfPresent(root, &context, error)) {
     return result;
   }
-  context.intelligenceCenterLevel = static_cast<int>(intelligenceCenterLevel);
 
   std::string gameMode = contract::kGameModeDefault;
   if (!readStringIfPresent(root, contract::kKeyGameMode, &gameMode, error)) {

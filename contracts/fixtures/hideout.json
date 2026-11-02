@@ -3,6 +3,7 @@
     "hideoutStations": [
       {
         "name": "Bitcoin farm",
+        "normalizedName": "bitcoin-farm",
         "levels": [
           { "level": 1, "itemRequirements": [] },
           {
@@ -15,6 +16,7 @@
       },
       {
         "name": "Water collector",
+        "normalizedName": "water-collector",
         "levels": [
           {
             "level": 1,

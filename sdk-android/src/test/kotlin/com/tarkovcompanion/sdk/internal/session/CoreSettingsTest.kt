@@ -86,12 +86,18 @@ class CoreSettingsTest {
             .fleaUnlocked(true)
             .gameMode(GameMode.PVE)
             .fleaMarginPercent(12)
+            .completedTaskIds(setOf("5967733e86f774602332fc84"))
+            .hideoutLevels(mapOf("bitcoin-farm" to 2))
             .build()
         val profile = JSONObject(CoreSettings.profileJson(playerProfile))
         assertEquals(10, profile.getInt("playerLevel"))
         assertTrue(profile.getBoolean("fleaUnlocked"))
         assertEquals("pve", profile.getString("gameMode"))
         assertEquals(12, profile.getInt("fleaMarginPercent"))
+        assertEquals("5967733e86f774602332fc84", profile.getJSONArray("completedTaskIds").getString(0))
+        assertEquals(2, profile.getJSONObject("hideoutLevels").getInt("bitcoin-farm"))
+        val withoutProgress = JSONObject(CoreSettings.profileJson(PlayerProfile.DEFAULT))
+        assertTrue("unknown progress is sent as null, read as absent", withoutProgress.isNull("hideoutLevels"))
     }
 
     @Test

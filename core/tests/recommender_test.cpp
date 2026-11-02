@@ -2,6 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+
 #include "json.h"
 #include "tarkov_parser.h"
 #include "test_util.h"
@@ -51,6 +55,36 @@ TEST_F(RecommenderTest, HideoutRequirementTriggersKeep) {
   EXPECT_EQ(recommendation.verdict, Verdict::Keep);
   ASSERT_EQ(recommendation.keepReasons.size(), 1u);
   EXPECT_EQ(recommendation.keepReasons[0].taskOrStationLabel, "Bitcoin farm L2");
+}
+
+TEST_F(RecommenderTest, CompletedQuestNoLongerKeepsTheItem) {
+  m_context.completedTaskIds = std::unordered_set<std::string>{"5967733e86f774602332fc84"};  // Shortage
+  auto recommendation = recommend(item("Salewa"), &m_hideout, m_context);
+  EXPECT_EQ(recommendation.verdict, Verdict::SellFlea);
+  EXPECT_TRUE(recommendation.keepReasons.empty());
+}
+
+TEST_F(RecommenderTest, OnlyHideoutLevelsAboveTheBuiltOneKeepTheItem) {
+  m_context.hideoutLevels = std::unordered_map<std::string, int>{};
+  EXPECT_EQ(recommend(item("GPU"), &m_hideout, m_context).verdict, Verdict::Keep) << "a station left out is not built";
+
+  (*m_context.hideoutLevels)["bitcoin-farm"] = 1;
+  EXPECT_EQ(recommend(item("GPU"), &m_hideout, m_context).verdict, Verdict::Keep) << "level 2 still needs it";
+
+  (*m_context.hideoutLevels)["bitcoin-farm"] = 2;
+  auto recommendation = recommend(item("GPU"), &m_hideout, m_context);
+  EXPECT_EQ(recommendation.verdict, Verdict::SellFlea);
+  EXPECT_TRUE(recommendation.keepReasons.empty());
+}
+
+TEST_F(RecommenderTest, IntelligenceCenterLevelComesFromTheHideout) {
+  m_context.ignoreKeepReasons = true;
+  int64_t feeWithoutDiscount = recommend(item("Salewa"), &m_hideout, m_context).flea->fee;
+
+  m_context.hideoutLevels = std::unordered_map<std::string, int>{{"intelligence-center", 3}};
+  int64_t feeWithDiscount = recommend(item("Salewa"), &m_hideout, m_context).flea->fee;
+
+  EXPECT_LT(feeWithDiscount, feeWithoutDiscount);
 }
 
 TEST_F(RecommenderTest, WithoutHideoutIndexOnlyTasksCount) {

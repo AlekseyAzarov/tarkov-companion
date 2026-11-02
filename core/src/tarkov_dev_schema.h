@@ -44,4 +44,6 @@ inline constexpr const char* kFieldCount = "count";
 
 inline constexpr const char* kItemTypeBannedFromFlea = "noFlea";
 
+inline constexpr const char* kStationIntelligenceCenter = "intelligence-center";
+
 }  // namespace tarkov_companion::tarkov_dev

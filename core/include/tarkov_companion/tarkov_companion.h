@@ -100,8 +100,13 @@ TARKOV_COMPANION_API void tarkov_companion_session_destroy(tarkov_companion_sess
 /*
  * Player context for subsequent commands. "fleaUnlocked" defaults to
  * playerLevel >= 15; "gameMode" also selects the data set and cache entries.
+ * "completedTaskIds" (tarkov.dev task ids) and "hideoutLevels" (built level by
+ * station normalizedName) are the player's progress; without them every quest
+ * and hideout level that takes an item keeps it.
  *
- *   { "playerLevel": 22, "fleaUnlocked": true, "intelligenceCenterLevel": 1,
+ *   { "playerLevel": 22, "fleaUnlocked": true,
+ *     "completedTaskIds": ["5967733e86f774602332fc84"],
+ *     "hideoutLevels": { "intelligence-center": 1, "bitcoin-farm": 2 },
  *     "gameMode": "regular" | "pve", "ignoreKeepReasons": false,
  *     "fleaMarginPercent": 5 }
  */
