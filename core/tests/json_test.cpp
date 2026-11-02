@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdlib>
+#include <random>
 #include <string>
 
 namespace tarkov_companion {
@@ -71,6 +73,41 @@ TEST(JsonParse, LongNumbersStayFinite) {
   auto zeroWithHugeExponent = parseJson("0e400");
   ASSERT_TRUE(zeroWithHugeExponent.ok) << zeroWithHugeExponent.error;
   EXPECT_EQ(zeroWithHugeExponent.value.asNumber(), 0.0);
+}
+
+TEST(JsonParse, ShortDecimalsAreCorrectlyRounded) {
+  EXPECT_EQ(parseJson("0.3").value.asNumber(), 0.3);
+  EXPECT_EQ(parseJson("1.1").value.asNumber(), 1.1);
+  EXPECT_EQ(parseJson("-2.675e-3").value.asNumber(), -2.675e-3);
+
+  // Up to 15 significant digits and a power of ten within ±22, against the C
+  // library's correctly rounded strtod.
+  std::mt19937_64 random(20261102);
+  std::uniform_int_distribution<uint64_t> mantissas(0, 999'999'999'999'999);
+  for (int attempt = 0; attempt < 100'000; ++attempt) {
+    std::string digits = std::to_string(mantissas(random));
+    int digitCount = static_cast<int>(digits.size());
+    int fractionDigits = std::uniform_int_distribution<int>(0, digitCount)(random);
+    int exponent = std::uniform_int_distribution<int>(fractionDigits - 22, fractionDigits + 22)(random);
+
+    std::string integerPart = digits.substr(0, digits.size() - static_cast<size_t>(fractionDigits));
+    std::string text = integerPart.empty() ? "0" : integerPart;
+    if (fractionDigits > 0) {
+      text += "." + digits.substr(integerPart.size());
+    }
+    if (exponent != 0) {
+      text += "e" + std::to_string(exponent);
+    }
+
+    auto parsed = parseJson(text);
+    ASSERT_TRUE(parsed.ok) << text;
+    ASSERT_EQ(parsed.value.asNumber(), std::strtod(text.c_str(), nullptr)) << text;
+  }
+}
+
+TEST(JsonParse, KeepsTheDigitsOfSubnormals) {
+  // 10^-326 alone underflows to zero, though the value itself is representable.
+  EXPECT_EQ(parseJson("9.99989e-321").value.asNumber(), std::strtod("9.99989e-321", nullptr));
 }
 
 TEST(JsonParse, DepthLimitStopsStackExhaustion) {

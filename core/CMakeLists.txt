@@ -8,6 +8,7 @@ project(tarkov_companion_core VERSION ${TARKOV_COMPANION_VERSION} LANGUAGES CXX)
 
 option(TARKOV_COMPANION_BUILD_TESTS "Build GoogleTest suite" OFF)
 option(TARKOV_COMPANION_SANITIZE "Build with ASan + UBSan (tests only)" OFF)
+option(TARKOV_COMPANION_BUILD_FUZZERS "Build libFuzzer targets (clang only)" OFF)
 
 include(cmake/contract.cmake)
 set(TARKOV_COMPANION_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
@@ -57,4 +58,8 @@ endif()
 if(TARKOV_COMPANION_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
+endif()
+
+if(TARKOV_COMPANION_BUILD_FUZZERS)
+  add_subdirectory(fuzz)
 endif()

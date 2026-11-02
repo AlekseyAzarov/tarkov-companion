@@ -25,6 +25,22 @@ jobs:
       - name: Test
         run: ctest --test-dir build/core --output-on-failure
 
+  fuzz:
+    name: C++ core fuzzers (libFuzzer)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: A minute per fuzzer
+        run: bash scripts/run-fuzzers.sh 60
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: fuzzer-crashes
+          path: build/fuzz/crashes/
+
   web:
     name: Web UI
     runs-on: ubuntu-24.04

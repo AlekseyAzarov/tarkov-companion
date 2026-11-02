@@ -40,6 +40,42 @@ constexpr double kSafeInt64CastLimit = 9.0e18;
 // "%.6g": enough for every double the core writes (ratios, not prices).
 constexpr const char* kDoubleFormat = "%.6g";
 
+// Integers up to 2^53 and powers of ten up to 10^22 are exact doubles.
+constexpr uint64_t kLargestExactInteger = uint64_t{1} << 53;
+constexpr int kLargestExactPowerOfTen = 22;
+// DBL_MIN is about 2.2e-308.
+constexpr int kSmallestNormalPowerOfTen = -307;
+constexpr double kExactPowersOfTen[kLargestExactPowerOfTen + 1] = {
+    1e0,  1e1,  1e2,  1e3,  1e4,  1e5,  1e6,  1e7,  1e8,  1e9,  1e10, 1e11,
+    1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22,
+};
+
+// mantissa * 10^power. When the mantissa and the power of ten are both exact,
+// a single multiplication or division rounds once, so the result is the
+// correctly rounded one strtod gives (Clinger's fast path): "0.3" is 0.3, not
+// 0.30000000000000004. Prices and short decimals take this path; longer or
+// far larger and smaller numbers go through pow and may be a few ulps off.
+double decimalToDouble(uint64_t mantissa, int power) {
+  if (mantissa == 0) {
+    // "0e400" would otherwise be 0 * inf, a NaN.
+    return 0;
+  }
+
+  double value = static_cast<double>(mantissa);
+  bool powerIsExact = power >= -kLargestExactPowerOfTen && power <= kLargestExactPowerOfTen;
+  if (mantissa <= kLargestExactInteger && powerIsExact) {
+    return power < 0 ? value / kExactPowersOfTen[-power] : value * kExactPowersOfTen[power];
+  }
+  if (power < kSmallestNormalPowerOfTen) {
+    // 10^power alone would be subnormal and lose the digits of a value that
+    // is still representable, such as 9.99989e-321.
+    double scaledUp = value * std::pow(10.0, power + kLargestExactPowerOfTen);
+    return scaledUp / kExactPowersOfTen[kLargestExactPowerOfTen];
+  }
+
+  return value * std::pow(10.0, power);
+}
+
 const JsonValue& sharedNull() {
   static const JsonValue kNull;
 
@@ -350,14 +386,15 @@ class Parser {
       return false;
     }
 
-    double mantissa = 0;
+    // 19 digits always fit: 10^19 - 1 is below 2^64.
+    uint64_t mantissa = 0;
     int significantDigits = 0;
     int decimalShift = 0;
     auto appendToMantissa = [&](char digit) {
       if (significantDigits == kSignificantDigitLimit) {
         return false;
       }
-      mantissa = mantissa * 10 + (digit - '0');
+      mantissa = mantissa * 10 + static_cast<uint64_t>(digit - '0');
       if (mantissa != 0) {
         ++significantDigits;
       }
@@ -395,8 +432,7 @@ class Parser {
       }
     }
 
-    // A zero mantissa stays zero: "0e400" would otherwise be 0 * inf, a NaN.
-    double magnitude = mantissa == 0 ? 0 : mantissa * std::pow(10.0, exponent + decimalShift);
+    double magnitude = decimalToDouble(mantissa, exponent + decimalShift);
     output = JsonValue::makeNumber(negative ? -magnitude : magnitude);
 
     return true;

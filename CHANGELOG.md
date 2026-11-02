@@ -7,6 +7,9 @@ All notable changes to the SDK. Format: [Keep a Changelog](https://keepachangelo
 ### Added
 - iOS: a Swift package (`sdk-ios`) with the headless API, search and verdicts with the offline cache and the catalog fallback, on the same core built as an XCFramework ([iOS guide](docs/ios.md), [ADR 0013](docs/adr/0013-ios-headless-layer.md)).
 
+### Fixed
+- JSON numbers with up to 15 significant digits are read correctly rounded: `0.3` was 0.30000000000000004.
+
 ## [0.1.0] - 2026-10-28
 
 ### Added

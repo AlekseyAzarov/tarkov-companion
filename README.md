@@ -111,13 +111,14 @@ The complete sample integration is [one file](host-game/src/withSdk/kotlin/com/t
 
 | Suite | Where it runs | Count |
 |---|---|---:|
-| C++ core (GoogleTest): parser, recommender, engine, session flows against a scripted platform, bridge protocol and state machine, protocol transcript, remote flags, analytics catalog, sign-in (PKCE, refresh, rotation, rate limits, sign-out races, forged redirects, token leaks), SHA-256, favourites (merge, conflicts between devices, offline queue), catalog fallback and search rules, settings, C API | host with ASan/UBSan in CI; on Android via [`run-core-tests-on-device.sh`](scripts/run-core-tests-on-device.sh) | 206 |
+| C++ core (GoogleTest): parser, recommender, engine, session flows against a scripted platform, bridge protocol and state machine, protocol transcript, remote flags, analytics catalog, sign-in (PKCE, refresh, rotation, rate limits, sign-out races, forged redirects, token leaks), SHA-256, favourites (merge, conflicts between devices, offline queue), catalog fallback and search rules, settings, C API | host with ASan/UBSan in CI; on Android via [`run-core-tests-on-device.sh`](scripts/run-core-tests-on-device.sh) | 211 |
 | Kotlin unit (JVM): session executor (action order on a thread pool, a slow request, failing stores, unreadable actions), bridge connections, sign-in plumbing, favourites plumbing, catalog setting, kill switch verdict, settings documents, action format, analytics catalog check, disk store, redirect scheme | JVM | 51 |
 | Instrumented: real `.so`, JNI, golden contract through the session, bridge round trip, remote flags, sign-in, favourites across a restart, Keystore secret store, public API end to end | emulator | 16 |
 | Web (vitest): bridge, protocol validators, protocol transcript, formatting | Node | 52 |
 | Development server (`node --test`): PKCE, the real form, rotation and reuse detection, revocation, favourites sync (conflicts, limit, clocks ahead), catalog serving | Node | 22 |
 | Catalog generator (`node --test`): search rules shared with the core, data mapping, response shapes against the GraphQL fixtures | Node | 11 |
 | Contract checker self-test (unchanged / additive / breaking upstream) | Node | 3 |
+| Fuzzers (libFuzzer with ASan/UBSan): JSON parser and writer, numbers against `strtod`, page messages to the bridge ([fuzzing](docs/fuzzing.md)) | host clang in CI, a minute per target; also on Android via the NDK | 3 targets |
 
 Two fixtures are contracts between the core and the web UI, tested from both sides: the verdict format ([`core_recommendation.json`](contracts/fixtures/core_recommendation.json), produced byte for byte by the C++ and instrumented tests, accepted by the TypeScript validators) and the bridge protocol as a conversation ([`bridge_transcript.json`](contracts/fixtures/bridge_transcript.json), replayed through the core, every reply accepted by the web side).
 
@@ -132,6 +133,7 @@ Requirements: JDK 17+, Android SDK with NDK 29.0.13846066 and CMake 3.22.1, Node
 ./gradlew footprintReport                        # build/reports/footprint.md
 cd web-ui && npm install && npm test && npm run dev   # web flow in a browser with a mock bridge
 node scripts/contract-check.mjs                  # live check against tarkov.dev
+bash scripts/run-fuzzers.sh 60                   # core fuzzers, needs clang
 ```
 
 Debug builds of the sample game fall back to the recorded fixtures when tarkov.dev is unreachable ([`DemoSupport.kt`](host-game/src/withSdkDebug/kotlin/com/tarkovcompanion/hostgame/DemoSupport.kt), itself an example of a host-provided `HttpTransport`). Release builds use the network only.
