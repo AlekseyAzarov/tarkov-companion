@@ -2,7 +2,7 @@
 // in contracts/; scripts/contract-check.mjs checks them nightly.
 #pragma once
 
-namespace tarkov_companion::tarkov_api {
+namespace tarkov_companion::tarkov_dev {
 
 inline constexpr const char* kRequestFieldQuery = "query";
 inline constexpr const char* kRequestFieldVariables = "variables";
@@ -44,10 +44,4 @@ inline constexpr const char* kFieldCount = "count";
 
 inline constexpr const char* kItemTypeBannedFromFlea = "noFlea";
 
-// Paths in the static catalog, under <base>/<game mode>/<language>/.
-inline constexpr const char* kCatalogSearchDirectory = "search/";
-inline constexpr const char* kCatalogItemsDirectory = "items/";
-inline constexpr const char* kCatalogHideoutFile = "hideout.json";
-inline constexpr const char* kCatalogFileExtension = ".json";
-
-}  // namespace tarkov_companion::tarkov_api
+}  // namespace tarkov_companion::tarkov_dev

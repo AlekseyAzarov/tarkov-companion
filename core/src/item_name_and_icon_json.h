@@ -7,14 +7,14 @@
 #include "contract_generated.h"
 #include "json.h"
 #include "model.h"
-#include "tarkov_api.h"
+#include "tarkov_dev_schema.h"
 
 namespace tarkov_companion {
 
 // Our payloads kept tarkov.dev's names, so one reader serves both.
-static_assert(std::string_view(contract::payload::kFieldName) == tarkov_api::kFieldName);
-static_assert(std::string_view(contract::payload::kFieldShortName) == tarkov_api::kFieldShortName);
-static_assert(std::string_view(contract::payload::kFieldIconLink) == tarkov_api::kFieldIconLink);
+static_assert(std::string_view(contract::payload::kFieldName) == tarkov_dev::kFieldName);
+static_assert(std::string_view(contract::payload::kFieldShortName) == tarkov_dev::kFieldShortName);
+static_assert(std::string_view(contract::payload::kFieldIconLink) == tarkov_dev::kFieldIconLink);
 static_assert(std::string_view(contract::payload::kFieldName) == contract::favorites_sync::kFieldName);
 static_assert(std::string_view(contract::payload::kFieldShortName) == contract::favorites_sync::kFieldShortName);
 static_assert(std::string_view(contract::payload::kFieldIconLink) == contract::favorites_sync::kFieldIconLink);

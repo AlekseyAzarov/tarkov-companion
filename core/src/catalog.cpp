@@ -4,7 +4,7 @@
 
 #include "contract_generated.h"
 #include "json.h"
-#include "tarkov_api.h"
+#include "tarkov_dev_schema.h"
 #include "text.h"
 #include "utf8.h"
 
@@ -109,7 +109,7 @@ std::optional<std::string> searchShardFileName(std::string_view query) {
   std::string fileName;
   text::appendLowercaseHex(fileName, firstCodePointsOfValidUtf8(longestWord, letters));
 
-  return fileName + tarkov_api::kCatalogFileExtension;
+  return fileName + contract::kCatalogFileExtension;
 }
 
 bool everyQueryWordStartsAWordOf(const std::vector<std::string>& queryWords, std::string_view name,
@@ -127,21 +127,21 @@ bool everyQueryWordStartsAWordOf(const std::vector<std::string>& queryWords, std
 std::optional<std::string> searchResponseFromShard(std::string_view shardJson, std::string_view query,
                                                    size_t maximumItems) {
   JsonParseResult parsed = parseJson(shardJson);
-  const JsonValue& items = parsed.value[tarkov_api::kFieldData][tarkov_api::kFieldItems];
+  const JsonValue& items = parsed.value[tarkov_dev::kFieldData][tarkov_dev::kFieldItems];
   if (!parsed.ok || !items.isArray()) {
     return std::nullopt;
   }
 
   std::vector<std::string> queryWords = lowercaseSearchWords(query);
   JsonWriter response;
-  response.beginObject().key(tarkov_api::kFieldData).beginObject().key(tarkov_api::kFieldItems).beginArray();
+  response.beginObject().key(tarkov_dev::kFieldData).beginObject().key(tarkov_dev::kFieldItems).beginArray();
   size_t keptItems = 0;
   for (const JsonValue& item : items.items()) {
     if (keptItems == maximumItems) {
       break;
     }
-    std::string_view name = item[tarkov_api::kFieldName].asString();
-    std::string_view shortName = item[tarkov_api::kFieldShortName].asString();
+    std::string_view name = item[tarkov_dev::kFieldName].asString();
+    std::string_view shortName = item[tarkov_dev::kFieldShortName].asString();
     if (!everyQueryWordStartsAWordOf(queryWords, name, shortName)) {
       continue;
     }

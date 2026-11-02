@@ -8,7 +8,7 @@
 
 #include "contract_generated.h"
 #include "json.h"
-#include "tarkov_api.h"
+#include "tarkov_dev_schema.h"
 #include "text.h"
 
 namespace tarkov_companion {
@@ -149,11 +149,11 @@ bool parseRootTreatingEmptyAsObject(std::string_view json, SettingsParseResult<S
 
 const char* tarkovDevGameModeArgument(GameMode mode) {
   switch (mode) {
-    case GameMode::Regular: return tarkov_api::kGameModeRegular;
-    case GameMode::Pve: return tarkov_api::kGameModePve;
+    case GameMode::Regular: return tarkov_dev::kGameModeRegular;
+    case GameMode::Pve: return tarkov_dev::kGameModePve;
   }
 
-  return tarkov_api::kGameModeRegular;
+  return tarkov_dev::kGameModeRegular;
 }
 
 SettingsParseResult<SessionConfiguration> parseSessionConfiguration(std::string_view json) {
@@ -304,8 +304,8 @@ SettingsParseResult<PlayerProfile> parsePlayerProfile(std::string_view json) {
   } else if (gameMode == tarkovDevGameModeArgument(GameMode::Pve)) {
     result.settings.gameMode = GameMode::Pve;
   } else {
-    *error = std::string(contract::kKeyGameMode) + " must be \"" + tarkov_api::kGameModeRegular + "\" or \"" +
-             tarkov_api::kGameModePve + "\"";
+    *error = std::string(contract::kKeyGameMode) + " must be \"" + tarkov_dev::kGameModeRegular + "\" or \"" +
+             tarkov_dev::kGameModePve + "\"";
     return result;
   }
 

@@ -35,6 +35,10 @@
     "favoritesMaximum": 200,
     "catalogShardLetters": 3,
     "catalogShardMinimumLetters": 2,
+    "catalogSearchDirectory": "search/",
+    "catalogItemsDirectory": "items/",
+    "catalogHideoutFile": "hideout.json",
+    "catalogFileExtension": ".json",
     "nativeAbiVersion": 2,
     "signInEntropyBytes": 48
   }

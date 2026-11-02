@@ -10,6 +10,10 @@ export const LANGUAGES = ['en', 'ru'];
 const LIMITS = JSON.parse(readFileSync(new URL('../../contracts/config-limits.json', import.meta.url), 'utf8'));
 const SHARD_LETTERS = LIMITS.shared.catalogShardLetters;
 const SHARD_MINIMUM_LETTERS = LIMITS.shared.catalogShardMinimumLetters;
+const SEARCH_DIRECTORY = LIMITS.shared.catalogSearchDirectory;
+const ITEMS_DIRECTORY = LIMITS.shared.catalogItemsDirectory;
+const HIDEOUT_FILE = LIMITS.shared.catalogHideoutFile;
+const FILE_EXTENSION = LIMITS.shared.catalogFileExtension;
 // Objectives that take the item away from the player: the verdict is "keep".
 // sellItem is not one: its objectives list nearly every item.
 const OBJECTIVES_TAKING_THE_ITEM = new Set(['giveItem', 'findItem', 'plantItem']);
@@ -83,7 +87,7 @@ export function shardFileForQueryOrNull(query) {
     return null;
   }
 
-  return `${utf8Hex(longestWordLetters.slice(0, SHARD_LETTERS).join(''))}.json`;
+  return `${utf8Hex(longestWordLetters.slice(0, SHARD_LETTERS).join(''))}${FILE_EXTENSION}`;
 }
 
 // Those of the first letters of each of the item's words.
@@ -92,7 +96,7 @@ export function shardFilesForItem(name, shortName) {
   for (const word of [...searchWords(name), ...searchWords(shortName)]) {
     const letters = [...word];
     for (let count = SHARD_MINIMUM_LETTERS; count <= Math.min(SHARD_LETTERS, letters.length); count += 1) {
-      shardFiles.add(`${utf8Hex(letters.slice(0, count).join(''))}.json`);
+      shardFiles.add(`${utf8Hex(letters.slice(0, count).join(''))}${FILE_EXTENSION}`);
     }
   }
 
@@ -223,7 +227,7 @@ export function buildGameModeFiles(gameMode, datasets, { updated, minimumItemCou
     const languageDirectory = `${gameMode}/${language}`;
     const recordsByShardFile = new Map();
     for (const record of records) {
-      files.set(`${languageDirectory}/items/${record.id}.json`, { data: { items: [record] }, extensions });
+      files.set(`${languageDirectory}/${ITEMS_DIRECTORY}${record.id}${FILE_EXTENSION}`, { data: { items: [record] }, extensions });
       for (const shardFile of shardFilesForItem(record.name, record.shortName)) {
         if (!recordsByShardFile.has(shardFile)) {
           recordsByShardFile.set(shardFile, []);
@@ -232,7 +236,7 @@ export function buildGameModeFiles(gameMode, datasets, { updated, minimumItemCou
       }
     }
     for (const [shardFile, shardRecords] of recordsByShardFile) {
-      files.set(`${languageDirectory}/search/${shardFile}`, { data: { items: shardRecords }, extensions });
+      files.set(`${languageDirectory}/${SEARCH_DIRECTORY}${shardFile}`, { data: { items: shardRecords }, extensions });
     }
 
     const hideoutStations = Object.values(stations).map((station) => ({
@@ -245,7 +249,7 @@ export function buildGameModeFiles(gameMode, datasets, { updated, minimumItemCou
         })),
       })),
     }));
-    files.set(`${languageDirectory}/hideout.json`, { data: { hideoutStations }, extensions });
+    files.set(`${languageDirectory}/${HIDEOUT_FILE}`, { data: { hideoutStations }, extensions });
   }
 
   return files;

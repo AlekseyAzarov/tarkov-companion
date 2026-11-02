@@ -9,7 +9,7 @@
 #include "contract_generated.h"
 #include "http.h"
 #include "recommender.h"
-#include "tarkov_api.h"
+#include "tarkov_dev_schema.h"
 #include "text.h"
 
 #ifndef TARKOV_COMPANION_VERSION_STRING
@@ -165,14 +165,14 @@ void Session::startSearchWithLockHeld(RequestId request, std::string_view rawQue
   }
 
   JsonWriter body = beginGraphqlRequest(contract::kQueryItemSearch);
-  body.key(tarkov_api::kVariableName).value(query)
-      .key(tarkov_api::kVariableLimit).value(kSearchResultLimit)
+  body.key(tarkov_dev::kVariableName).value(query)
+      .key(tarkov_dev::kVariableLimit).value(kSearchResultLimit)
       .endObject()
       .endObject();
   // The catalog has no search engine: the query's shard is filtered here.
   std::optional<std::string> shardFileName = catalog::searchShardFileName(query);
   std::string shardUrl =
-      shardFileName ? catalogFileUrlOrEmpty(tarkov_api::kCatalogSearchDirectory + *shardFileName) : std::string();
+      shardFileName ? catalogFileUrlOrEmpty(contract::kCatalogSearchDirectory + *shardFileName) : std::string();
   Upstream upstream{body.takeText(), shardUrl,
                     [query = std::string(query)](std::string_view shardFile) {
                       return catalog::searchResponseFromShard(shardFile, query, kSearchResultLimit);
@@ -519,7 +519,7 @@ void Session::ensureHideout(std::function<void(bool ready)> done) {
 
     JsonWriter body = beginGraphqlRequest(contract::kQueryHideout);
     body.endObject().endObject();
-    Upstream upstream{body.takeText(), catalogFileUrlOrEmpty(tarkov_api::kCatalogHideoutFile), nullptr};
+    Upstream upstream{body.takeText(), catalogFileUrlOrEmpty(contract::kCatalogHideoutFile), nullptr};
     ParseAndStoreInEngine parseAndStore = [this](std::string_view response) {
       return m_engine.parseAndStoreHideout(response);
     };
@@ -567,8 +567,8 @@ void Session::recommendWithHideout(RequestId request, const std::string& itemId,
   // Not in the in-memory catalog: evicted, or the process was restarted and
   // the UI restored a previously opened item. Fetch it by id.
   JsonWriter body = beginGraphqlRequest(contract::kQueryItemById);
-  body.key(tarkov_api::kVariableIds).beginArray().value(itemId).endArray().endObject().endObject();
-  std::string itemFile = tarkov_api::kCatalogItemsDirectory + itemId + tarkov_api::kCatalogFileExtension;
+  body.key(tarkov_dev::kVariableIds).beginArray().value(itemId).endArray().endObject().endObject();
+  std::string itemFile = contract::kCatalogItemsDirectory + itemId + contract::kCatalogFileExtension;
   Upstream upstream{body.takeText(), catalogFileUrlOrEmpty(itemFile), nullptr};
 
   fetchItems(cacheKey(kCacheKindItem, itemId), std::move(upstream), request,
@@ -1014,10 +1014,10 @@ std::string Session::cacheKey(std::string_view kind, std::string_view subject) c
 JsonWriter Session::beginGraphqlRequest(const char* query) const {
   JsonWriter body;
   body.beginObject()
-      .key(tarkov_api::kRequestFieldQuery).value(query)
-      .key(tarkov_api::kRequestFieldVariables).beginObject()
-          .key(tarkov_api::kVariableLanguage).value(m_configuration.language)
-          .key(tarkov_api::kVariableGameMode).value(tarkovDevGameModeArgument(m_profile.gameMode));
+      .key(tarkov_dev::kRequestFieldQuery).value(query)
+      .key(tarkov_dev::kRequestFieldVariables).beginObject()
+          .key(tarkov_dev::kVariableLanguage).value(m_configuration.language)
+          .key(tarkov_dev::kVariableGameMode).value(tarkovDevGameModeArgument(m_profile.gameMode));
 
   return body;
 }
