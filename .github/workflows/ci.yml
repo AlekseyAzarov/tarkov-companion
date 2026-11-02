@@ -169,12 +169,36 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+      # The emulator action downloads the system image on every run, and a failed download fails the job
+      # before any test runs; a cached image and AVD (with a booted snapshot) skip both the download and the cold boot.
+      - name: System image and AVD cache
+        uses: actions/cache@v6
+        id: avd-cache
+        with:
+          path: |
+            /usr/local/lib/android/sdk/system-images/android-34/google_apis/x86_64
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-google_apis-x86_64
+      - name: Create the AVD and a snapshot to cache
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "AVD snapshot created for the cache"
       - name: Instrumented tests + core tests on the emulator ABI
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           arch: x86_64
           target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: |
             ./gradlew :sdk-android:connectedDebugAndroidTest
