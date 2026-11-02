@@ -20,7 +20,6 @@ query ItemById($ids: [ID], $lang: LanguageCode, $gameMode: GameMode) {
     usedInTasks {
       id
       name
-      minPlayerLevel
     }
   }
 }

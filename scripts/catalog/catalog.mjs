@@ -201,7 +201,6 @@ export function buildGameModeFiles(gameMode, datasets, { updated, minimumItemCou
       const usedInTasks = [...(tasksByItemId.get(item.id)?.values() ?? [])].map((task) => ({
         id: task.id,
         name: translateTask(task.name),
-        minPlayerLevel: task.minPlayerLevel ?? 0,
       }));
 
       records.push({

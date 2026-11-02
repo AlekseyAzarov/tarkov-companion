@@ -18,7 +18,7 @@
           { "priceRUB": 25000, "vendor": { "name": "Flea Market", "normalizedName": "flea-market" } }
         ],
         "usedInTasks": [
-          { "id": "5967733e86f774602332fc84", "name": "Shortage", "minPlayerLevel": 1 }
+          { "id": "5967733e86f774602332fc84", "name": "Shortage" }
         ]
       },
       {

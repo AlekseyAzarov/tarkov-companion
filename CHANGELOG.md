@@ -10,6 +10,9 @@ All notable changes to the SDK. Format: [Keep a Changelog](https://keepachangelo
 ### Fixed
 - JSON numbers with up to 15 significant digits are read correctly rounded: `0.3` was 0.30000000000000004.
 
+### Removed
+- Queries no longer ask for a task's `minPlayerLevel`, which nothing used.
+
 ## [0.1.0] - 2026-10-28
 
 ### Added

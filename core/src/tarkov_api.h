@@ -36,7 +36,6 @@ inline constexpr const char* kFieldVendor = "vendor";
 inline constexpr const char* kFieldNormalizedName = "normalizedName";
 inline constexpr const char* kFieldPriceRubles = "priceRUB";
 inline constexpr const char* kFieldUsedInTasks = "usedInTasks";
-inline constexpr const char* kFieldMinimumPlayerLevel = "minPlayerLevel";
 inline constexpr const char* kFieldLevels = "levels";
 inline constexpr const char* kFieldLevel = "level";
 inline constexpr const char* kFieldItemRequirements = "itemRequirements";

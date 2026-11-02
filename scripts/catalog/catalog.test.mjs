@@ -138,7 +138,7 @@ describe('buildGameModeFiles', () => {
       { priceRUB: 100980, vendor: { name: 'Therapist', normalizedName: 'therapist' } },
       { priceRUB: 299000, vendor: { name: 'Flea Market', normalizedName: 'flea-market' } },
     ]);
-    assert.deepEqual(graphicsCard.usedInTasks, [{ id: 'k1', name: 'Profit Retention', minPlayerLevel: 10 }]);
+    assert.deepEqual(graphicsCard.usedInTasks, [{ id: 'k1', name: 'Profit Retention' }]);
     assert.deepEqual(itemFile('en', 'case').sellFor, [], 'flea-banned: no flea offer');
   });
 

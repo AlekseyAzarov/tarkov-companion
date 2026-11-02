@@ -19,7 +19,7 @@
 
 namespace tarkov_companion {
 
-// Reaches the session's Authentication for flows the C API only exercises in stage 4b
+// Reaches the session's Authentication directly, for flows the C API tests don't drive
 // (authorized requests). Single-threaded tests: the lock is not needed.
 class SessionTestAccess {
  public:

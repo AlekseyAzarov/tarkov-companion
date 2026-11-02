@@ -78,7 +78,6 @@ Item parseItem(const JsonValue& json) {
     TaskReference task;
     task.id = std::string(taskJson[tarkov_api::kFieldId].asString());
     task.name = std::string(taskJson[tarkov_api::kFieldName].asString());
-    task.minimumPlayerLevel = static_cast<int>(taskJson[tarkov_api::kFieldMinimumPlayerLevel].asInteger());
     if (!task.id.empty()) {
       item.usedInTasks.push_back(std::move(task));
     }

@@ -22,7 +22,6 @@ struct SellOffer {
 struct TaskReference {
   std::string id;
   std::string name;
-  int minimumPlayerLevel = 0;
 };
 
 struct ItemNameAndIcon {
